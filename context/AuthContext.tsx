@@ -22,7 +22,7 @@ const DEMO_USERS: (User & { password: string })[] = [
     id: "usr-admin",
     name: "Nithu Admin",
     email: "admin@nithufashion.com",
-    phone: "9500706295",
+    phone: "9585477733",
     address: "Bazaar Street, Main Tailoring Unit",
     city: "Komarapalayam",
     role: "admin",

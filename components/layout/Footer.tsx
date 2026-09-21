@@ -145,8 +145,8 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2.5 text-xs text-cream-ivory/90">
               <li className="flex items-start gap-2">
                 <Phone className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
-                <a href="tel:9500706295" className="hover:text-gold transition-colors">
-                  9500706295 / 9585477733
+                <a href="tel:9585477733" className="hover:text-gold transition-colors">
+                  9585477733
                 </a>
               </li>
               <li className="flex items-center gap-2">
@@ -231,7 +231,7 @@ export const Footer: React.FC = () => {
                 <Facebook className="w-4 h-4" />
               </a>
               <a
-                href="https://wa.me/919500706295"
+                href="https://wa.me/919585477733"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="WhatsApp"

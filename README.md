@@ -25,7 +25,23 @@ A luxury fashion and custom tailoring e-commerce web platform designed with a bu
   - Wishlist Drawer for favorite items.
   - Quick View modal with custom sizing options.
   - Book Custom Tailoring consultation modal with WhatsApp integration.
-- **Footer**: 5-column burgundy footer with direct phone numbers (`9500706295`, `9585477733`), address (Komarapalayam, Tamil Nadu), and newsletter.
+- **Footer**: 5-column burgundy footer with direct phone number (`9585477733`), address (Komarapalayam, Tamil Nadu), and newsletter.
+
+---
+
+## 🔑 Login Credentials
+
+### 👑 Administrator Account
+- **URL**: `/admin` (or Sign In via modal)
+- **Email**: `admin@nithufashion.com`
+- **Password**: `admin123`
+- *(Or use the 1-click **Admin Portal** demo button in the Sign In modal)*
+
+### 🛍️ Customer Account
+- **URL**: `/account`
+- **Email**: `priya@example.com`
+- **Password**: `user123`
+- *(Or use the 1-click **Customer** demo button in the Sign In modal)*
 
 ---
 

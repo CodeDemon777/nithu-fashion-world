@@ -84,7 +84,7 @@ export const BookServiceModal: React.FC = () => {
             </p>
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
               <a
-                href="https://wa.me/919500706295"
+                href="https://wa.me/919585477733"
                 target="_blank"
                 rel="noreferrer"
                 className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-semibold flex items-center justify-center gap-2"
@@ -211,10 +211,6 @@ export const BookServiceModal: React.FC = () => {
 
             <div className="pt-2 text-center text-[11px] text-charcoal-muted">
               Direct Helpline:{" "}
-              <a href="tel:9500706295" className="text-burgundy font-semibold">
-                9500706295
-              </a>{" "}
-              /{" "}
               <a href="tel:9585477733" className="text-burgundy font-semibold">
                 9585477733
               </a>
