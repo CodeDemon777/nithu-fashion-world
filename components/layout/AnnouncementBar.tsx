@@ -28,7 +28,7 @@ export const AnnouncementBar: React.FC = () => {
           <span className="hidden sm:inline text-gold-light/80 font-medium">Follow Us:</span>
           <div className="flex items-center gap-3">
             <a
-              href="https://instagram.com/nithu_fashion_world"
+              href="https://www.instagram.com/nithufashionworld?stkn=MTBrd253OWQ0Nmd2dA=="
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"

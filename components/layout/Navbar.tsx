@@ -4,20 +4,24 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useShop } from "@/context/ShopContext";
-import { PRODUCTS } from "@/lib/data";
+import { useAuth } from "@/context/AuthContext";
 import {
   Search,
   Heart,
-  User,
+  User as UserIcon,
   ShoppingBag,
   Menu,
   X,
   Sparkles,
   ArrowRight,
+  ShieldCheck,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
 
 export const Navbar: React.FC = () => {
   const {
+    products,
     cartCount,
     wishlistCount,
     setIsCartOpen,
@@ -28,9 +32,12 @@ export const Navbar: React.FC = () => {
     setQuickViewProduct,
   } = useShop();
 
+  const { user, setIsAuthModalOpen, logout } = useAuth();
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,7 +48,7 @@ export const Navbar: React.FC = () => {
   }, []);
 
   const searchResults = searchQuery.trim()
-    ? PRODUCTS.filter(
+    ? products.filter(
         (p) =>
           p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           p.categoryLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -50,12 +57,12 @@ export const Navbar: React.FC = () => {
     : [];
 
   const navLinks = [
-    { name: "Home", href: "#home", active: true },
-    { name: "Shop", href: "#featured-collection" },
-    { name: "Tailoring", href: "#services" },
-    { name: "Art & Crafts", href: "#categories" },
-    { name: "About Us", href: "#how-it-works" },
-    { name: "Contact", href: "#footer" },
+    { name: "Home", href: "/#home" },
+    { name: "Shop", href: "/#featured-collection" },
+    { name: "Tailoring", href: "/#services" },
+    { name: "Art & Crafts", href: "/#categories" },
+    { name: "About Us", href: "/#how-it-works" },
+    { name: "Contact", href: "/#footer" },
   ];
 
   return (
@@ -75,12 +82,12 @@ export const Navbar: React.FC = () => {
 
           {/* Desktop Navigation Center */}
           <nav className="hidden lg:flex items-center gap-7 text-[14px] font-medium text-charcoal">
-            {navLinks.map((link) => (
+            {navLinks.map((link, idx) => (
               <a
                 key={link.name}
                 href={link.href}
                 className={`nav-link-underline transition-colors py-1 ${
-                  link.active
+                  idx === 0
                     ? "text-burgundy font-semibold active"
                     : "hover:text-burgundy text-charcoal-muted"
                 }`}
@@ -91,13 +98,13 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Search + Icons Right */}
-          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3.5 flex-shrink-0">
             {/* Search Pill Input with Autocomplete */}
-            <div className="relative hidden md:block w-48 lg:w-64">
+            <div className="relative hidden md:block w-44 lg:w-56">
               <div className="relative flex items-center">
                 <input
                   type="text"
-                  placeholder="Search for products..."
+                  placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
@@ -169,14 +176,94 @@ export const Navbar: React.FC = () => {
               )}
             </button>
 
-            {/* User Profile Button */}
-            <button
-              aria-label="User Account"
-              onClick={() => setIsBookingModalOpen(true)}
-              className="p-2 text-charcoal hover:text-burgundy transition-colors rounded-full hover:bg-cream-soft"
-            >
-              <User className="w-5 h-5 text-burgundy" />
-            </button>
+            {/* User Account / Profile Dropdown */}
+            <div className="relative">
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-1.5 p-1 sm:px-2.5 sm:py-1 rounded-full bg-cream-soft hover:bg-blush-light border border-blush text-xs font-medium transition-all"
+                  >
+                    <img
+                      src={
+                        user.avatar ||
+                        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80"
+                      }
+                      alt={user.name}
+                      className="w-6 h-6 rounded-full object-cover border border-gold"
+                    />
+                    <span className="hidden sm:inline text-xs font-semibold text-charcoal max-w-[80px] truncate">
+                      {user.name.split(" ")[0]}
+                    </span>
+                    <ChevronDown className="w-3 h-3 text-charcoal-muted" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {userDropdownOpen && (
+                    <div
+                      onMouseLeave={() => setUserDropdownOpen(false)}
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-luxury-lg border border-blush p-2 z-50 text-xs animate-fadeIn"
+                    >
+                      <div className="px-3 py-2 border-b border-cream-warm">
+                        <div className="font-semibold text-charcoal truncate">
+                          {user.name}
+                        </div>
+                        <div className="text-[10px] text-charcoal-muted truncate">
+                          {user.email}
+                        </div>
+                        <span className="inline-block mt-1 text-[9px] uppercase font-bold tracking-wider text-gold-dark bg-gold/15 px-2 py-0.5 rounded-full">
+                          {user.role === "admin" ? "Administrator 👑" : "Customer ✨"}
+                        </span>
+                      </div>
+
+                      <div className="py-1">
+                        <Link
+                          href="/account"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 text-charcoal hover:text-burgundy hover:bg-cream-soft rounded-lg transition-colors"
+                        >
+                          <UserIcon className="w-3.5 h-3.5 text-burgundy" />
+                          <span>Customer Portal</span>
+                        </Link>
+
+                        {user.role === "admin" && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2 px-3 py-2 text-charcoal hover:text-burgundy hover:bg-cream-soft rounded-lg transition-colors"
+                          >
+                            <ShieldCheck className="w-3.5 h-3.5 text-gold-dark" />
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        )}
+                      </div>
+
+                      <div className="pt-1 border-t border-cream-warm">
+                        <button
+                          onClick={() => {
+                            logout();
+                            setUserDropdownOpen(false);
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-left"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  aria-label="Sign In"
+                  className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-full bg-cream-soft hover:bg-blush-light text-burgundy border border-blush text-xs font-semibold transition-all"
+                >
+                  <UserIcon className="w-4 h-4 text-burgundy" />
+                  <span className="hidden sm:inline">Sign In</span>
+                </button>
+              )}
+            </div>
 
             {/* Cart Button with Count Badge */}
             <button
@@ -232,7 +319,26 @@ export const Navbar: React.FC = () => {
                   <ArrowRight className="w-4 h-4 text-gold" />
                 </a>
               ))}
-              <div className="pt-2 flex flex-col gap-3">
+              
+              <div className="pt-2 flex flex-col gap-2.5">
+                <Link
+                  href="/account"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2.5 bg-cream-soft border border-blush text-burgundy text-sm font-semibold rounded-full text-center flex items-center justify-center gap-2"
+                >
+                  <UserIcon className="w-4 h-4" />
+                  <span>Customer Portal</span>
+                </Link>
+
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2.5 bg-burgundy-deep text-cream text-sm font-semibold rounded-full text-center flex items-center justify-center gap-2"
+                >
+                  <ShieldCheck className="w-4 h-4 text-gold" />
+                  <span>Admin Dashboard</span>
+                </Link>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);

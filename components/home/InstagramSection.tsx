@@ -41,7 +41,7 @@ export const InstagramSection: React.FC = () => {
             {INSTAGRAM_POSTS.map((post) => (
               <a
                 key={post.id}
-                href="https://instagram.com/nithu_fashion_world"
+                href="https://www.instagram.com/nithufashionworld?stkn=MTBrd253OWQ0Nmd2dA=="
                 target="_blank"
                 rel="noreferrer"
                 className="group relative aspect-square rounded-xl overflow-hidden bg-cream-soft border border-blush/60 shadow-sm"
@@ -66,10 +66,10 @@ export const InstagramSection: React.FC = () => {
           {/* Right Follow Action */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <span className="text-xs font-semibold text-charcoal-muted">
-              @nithu_fashion_world
+              @nithufashionworld
             </span>
             <a
-              href="https://instagram.com/nithu_fashion_world"
+              href="https://www.instagram.com/nithufashionworld?stkn=MTBrd253OWQ0Nmd2dA=="
               target="_blank"
               rel="noreferrer"
               className="bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all"

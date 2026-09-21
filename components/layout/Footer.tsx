@@ -152,12 +152,12 @@ export const Footer: React.FC = () => {
               <li className="flex items-center gap-2">
                 <Instagram className="w-3.5 h-3.5 text-gold flex-shrink-0" />
                 <a
-                  href="https://instagram.com/nithu_fashion_world"
+                  href="https://www.instagram.com/nithufashionworld?stkn=MTBrd253OWQ0Nmd2dA=="
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-gold transition-colors truncate"
                 >
-                  @nithu_fashion_world
+                  @nithufashionworld
                 </a>
               </li>
               <li className="flex items-center gap-2">

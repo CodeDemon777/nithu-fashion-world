@@ -11,6 +11,7 @@ export const BookServiceModal: React.FC = () => {
     bookingPreselectService,
     showToast,
     triggerConfetti,
+    addTailoringInquiry,
   } = useShop();
 
   const [fullName, setFullName] = useState("");
@@ -30,6 +31,14 @@ export const BookServiceModal: React.FC = () => {
       showToast("Please enter your name and contact phone number.");
       return;
     }
+
+    addTailoringInquiry({
+      fullName,
+      phone,
+      city,
+      serviceType,
+      notes,
+    });
 
     setSubmitted(true);
     triggerConfetti();

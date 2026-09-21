@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   authors: [{ name: "NITHU FASHION WORLD" }],
 };
 
+import { AuthProvider } from "@/context/AuthContext";
+import { AuthModal } from "@/components/modals/AuthModal";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,26 +43,29 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="antialiased min-h-screen flex flex-col bg-[#FFF7F0] text-[#24191A] selection:bg-burgundy selection:text-cream">
-        <ShopProvider>
-          {/* Top Announcement Bar */}
-          <AnnouncementBar />
+        <AuthProvider>
+          <ShopProvider>
+            {/* Top Announcement Bar */}
+            <AnnouncementBar />
 
-          {/* Sticky Navbar */}
-          <Navbar />
+            {/* Sticky Navbar */}
+            <Navbar />
 
-          {/* Page Content */}
-          <main className="flex-1">{children}</main>
+            {/* Page Content */}
+            <main className="flex-1">{children}</main>
 
-          {/* Luxury Footer */}
-          <Footer />
+            {/* Luxury Footer */}
+            <Footer />
 
-          {/* Global Interactive Modals & Drawers */}
-          <CartDrawer />
-          <WishlistDrawer />
-          <QuickViewModal />
-          <BookServiceModal />
-          <ToastNotification />
-        </ShopProvider>
+            {/* Global Interactive Modals & Drawers */}
+            <CartDrawer />
+            <WishlistDrawer />
+            <QuickViewModal />
+            <BookServiceModal />
+            <AuthModal />
+            <ToastNotification />
+          </ShopProvider>
+        </AuthProvider>
       </body>
     </html>
   );
