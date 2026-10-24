@@ -1,20 +1,36 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase, isDbConfigured } from "@/lib/mongodb";
 import CustomerModel from "@/models/Customer";
+import { applyRateLimit } from "@/lib/rate-limit";
+import { validateEmail, sanitizeString } from "@/lib/validation";
 
 // POST /api/customers/login - Login customer with MongoDB Atlas
 export async function POST(req: Request) {
-  try {
-    const { email, password } = await req.json();
+  // 1. Strict Rate Limiting Check (max 10 login attempts per minute per IP to prevent brute force)
+  const rateLimitResponse = applyRateLimit(req, "AUTH");
+  if (rateLimitResponse) return rateLimitResponse;
 
-    if (!email || !password) {
+  try {
+    const body = await req.json();
+
+    // 2. Validate inputs
+    const emailResult = validateEmail(body?.email);
+    if (!emailResult.isValid || !emailResult.value) {
       return NextResponse.json(
-        { success: false, error: "Email and password are required" },
+        { success: false, error: emailResult.error || "Valid email is required" },
         { status: 400 }
       );
     }
 
-    const cleanEmail = email.toLowerCase().trim();
+    const cleanEmail = emailResult.value;
+    const cleanPassword = sanitizeString(body?.password, 100);
+
+    if (!cleanPassword) {
+      return NextResponse.json(
+        { success: false, error: "Password is required" },
+        { status: 400 }
+      );
+    }
 
     if (!isDbConfigured()) {
       // Local fallback for quick demo login
@@ -44,7 +60,7 @@ export async function POST(req: Request) {
       const created = await CustomerModel.create({
         name: cleanEmail.split("@")[0].toUpperCase(),
         email: cleanEmail,
-        password: password,
+        password: cleanPassword,
         role: isDemoAdmin ? "admin" : "customer",
         city: "Tamil Nadu",
         joinedDate: new Date().toLocaleDateString("en-US", {
@@ -67,7 +83,7 @@ export async function POST(req: Request) {
     }
 
     // Verify password if set
-    if (customer.password && customer.password !== password) {
+    if (customer.password && customer.password !== cleanPassword) {
       return NextResponse.json(
         { success: false, error: "Incorrect password. Please try again." },
         { status: 401 }

@@ -2,12 +2,18 @@ import { NextResponse } from "next/server";
 import { connectToDatabase, isDbConfigured } from "@/lib/mongodb";
 import ProductModel from "@/models/Product";
 import mongoose from "mongoose";
+import { applyRateLimit } from "@/lib/rate-limit";
+import { sanitizeString, validateNumber } from "@/lib/validation";
 
 // PUT /api/products/[id] - Update product in MongoDB Atlas
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
+  // 1. Rate Limiting Check
+  const rateLimitResponse = applyRateLimit(req, "WRITE");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const { id } = params;
     const body = await req.json();
@@ -23,9 +29,20 @@ export async function PUT(
 
     const query = mongoose.Types.ObjectId.isValid(id)
       ? { _id: id }
-      : { slug: id };
+      : { slug: sanitizeString(id, 100) };
 
-    const updated = await ProductModel.findOneAndUpdate(query, body, {
+    // Sanitize updatable fields
+    const sanitizedUpdate: Record<string, any> = {};
+
+    if (body.name !== undefined) sanitizedUpdate.name = sanitizeString(body.name, 120);
+    if (body.price !== undefined) sanitizedUpdate.price = validateNumber(body.price, 0, 1_000_000);
+    if (body.oldPrice !== undefined) sanitizedUpdate.oldPrice = validateNumber(body.oldPrice, 0, 1_000_000);
+    if (body.discount !== undefined) sanitizedUpdate.discount = validateNumber(body.discount, 0, 100);
+    if (body.inStock !== undefined) sanitizedUpdate.inStock = Boolean(body.inStock);
+    if (body.description !== undefined) sanitizedUpdate.description = sanitizeString(body.description, 1500);
+    if (body.image !== undefined) sanitizedUpdate.image = sanitizeString(body.image, 400);
+
+    const updated = await ProductModel.findOneAndUpdate(query, sanitizedUpdate, {
       new: true,
       runValidators: true,
     }).lean();
@@ -56,9 +73,13 @@ export async function PUT(
 
 // DELETE /api/products/[id] - Delete product from MongoDB Atlas
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: { id: string } }
 ) {
+  // 1. Rate Limiting Check
+  const rateLimitResponse = applyRateLimit(req, "WRITE");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const { id } = params;
 
@@ -73,7 +94,7 @@ export async function DELETE(
 
     const query = mongoose.Types.ObjectId.isValid(id)
       ? { _id: id }
-      : { slug: id };
+      : { slug: sanitizeString(id, 100) };
 
     const deleted = await ProductModel.findOneAndDelete(query);
 

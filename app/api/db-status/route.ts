@@ -4,9 +4,13 @@ import mongoose from "mongoose";
 import ProductModel from "@/models/Product";
 import CustomerModel from "@/models/Customer";
 import OrderModel from "@/models/Order";
+import { applyRateLimit } from "@/lib/rate-limit";
 
 // GET /api/db-status - Check live MongoDB Atlas connection
-export async function GET() {
+export async function GET(req: Request) {
+  const rateLimitResponse = applyRateLimit(req, "READ");
+  if (rateLimitResponse) return rateLimitResponse;
+
   const configured = isDbConfigured();
 
   if (!configured) {
@@ -62,7 +66,6 @@ export async function GET() {
       connected: false,
       status: "error",
       message: friendlyMessage,
-      rawError: error.message,
     });
   }
 }

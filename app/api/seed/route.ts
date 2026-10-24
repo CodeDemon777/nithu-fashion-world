@@ -4,6 +4,8 @@ import ProductModel from "@/models/Product";
 import CustomerModel from "@/models/Customer";
 import { PRODUCTS as DEFAULT_PRODUCTS } from "@/lib/data";
 
+import { applyRateLimit } from "@/lib/rate-limit";
+
 const DEFAULT_CUSTOMERS = [
   {
     name: "Priya Sundaram",
@@ -50,7 +52,10 @@ const DEFAULT_CUSTOMERS = [
 ];
 
 // POST /api/seed - Seed database with full product catalog & initial customers
-export async function POST() {
+export async function POST(req: Request) {
+  const rateLimitResponse = applyRateLimit(req, "AUTH");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     if (!isDbConfigured()) {
       return NextResponse.json(

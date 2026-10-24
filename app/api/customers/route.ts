@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase, isDbConfigured } from "@/lib/mongodb";
 import CustomerModel from "@/models/Customer";
+import { applyRateLimit } from "@/lib/rate-limit";
+import { validateCustomerPayload } from "@/lib/validation";
 
 const DEFAULT_DEMO_CUSTOMERS = [
   {
@@ -48,7 +50,11 @@ const DEFAULT_DEMO_CUSTOMERS = [
 ];
 
 // GET /api/customers - List all customers from MongoDB Atlas
-export async function GET() {
+export async function GET(req: Request) {
+  // 1. Rate Limiting Check
+  const rateLimitResponse = applyRateLimit(req, "READ");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     if (!isDbConfigured()) {
       return NextResponse.json({
@@ -142,29 +148,35 @@ export async function GET() {
 
 // POST /api/customers - Register or create customer in MongoDB Atlas
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
+  // 1. Strict Auth Rate Limiting Check (prevents bot spam & credential stuffing)
+  const rateLimitResponse = applyRateLimit(req, "AUTH");
+  if (rateLimitResponse) return rateLimitResponse;
 
-    if (!body.email || !body.name) {
+  try {
+    const rawBody = await req.json();
+
+    // 2. Validate and sanitize input
+    const validation = validateCustomerPayload(rawBody);
+    if (!validation.isValid || !validation.sanitized) {
       return NextResponse.json(
-        { success: false, error: "Name and email are required" },
+        { success: false, errors: validation.errors },
         { status: 400 }
       );
     }
 
-    const email = body.email.toLowerCase().trim();
+    const { sanitized } = validation;
 
     if (!isDbConfigured()) {
       // Return successful local fallback response
       const fallbackUser = {
         id: "usr-" + Date.now(),
-        name: body.name.trim(),
-        email,
-        phone: body.phone || "",
-        role: email.includes("admin") ? "admin" : "customer",
-        address: body.address || "",
-        city: body.city || "Tamil Nadu",
-        pincode: body.pincode || "",
+        name: sanitized.name,
+        email: sanitized.email,
+        phone: sanitized.phone,
+        role: sanitized.email.includes("admin") ? "admin" : "customer",
+        address: sanitized.address,
+        city: sanitized.city,
+        pincode: sanitized.pincode,
         joinedDate: "Just now",
         totalOrders: 0,
         totalSpent: 0,
@@ -180,7 +192,7 @@ export async function POST(req: Request) {
     await connectToDatabase();
 
     // Check if customer already exists
-    const existing = await CustomerModel.findOne({ email });
+    const existing = await CustomerModel.findOne({ email: sanitized.email });
     if (existing) {
       return NextResponse.json(
         {
@@ -192,16 +204,15 @@ export async function POST(req: Request) {
     }
 
     const newCustomer = await CustomerModel.create({
-      name: body.name.trim(),
-      email,
-      phone: body.phone || "",
-      password: body.password || "user123",
-      role: email.includes("admin") ? "admin" : "customer",
-      address: body.address || "",
-      city: body.city || "Tamil Nadu",
-      pincode: body.pincode || "",
+      name: sanitized.name,
+      email: sanitized.email,
+      phone: sanitized.phone,
+      password: sanitized.password || "user123",
+      role: sanitized.email.includes("admin") ? "admin" : "customer",
+      address: sanitized.address,
+      city: sanitized.city,
+      pincode: sanitized.pincode,
       avatar:
-        body.avatar ||
         "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
       joinedDate: new Date().toLocaleDateString("en-US", {
         month: "short",

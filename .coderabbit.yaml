@@ -1,0 +1,47 @@
+# CodeRabbit Configuration
+# Reference: https://docs.coderabbit.ai/guides/configure-coderabbit
+
+version: "2"
+language: "en-US"
+tone_instructions: "Provide security-focused, pragmatic, and high-impact code reviews."
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "master"
+      - "main"
+
+  # Path filters
+  path_filters:
+    - "!node_modules/**"
+    - "!.next/**"
+    - "!package-lock.json"
+
+  # Custom security & quality rules
+  instructions: |
+    - Strictly enforce that no secrets, database credentials, or private API keys are ever committed.
+    - Check that all user inputs to API endpoints are validated and sanitized to prevent XSS and NoSQL injections.
+    - Ensure rate limiting is applied to write and authentication endpoints.
+    - Verify TypeScript type safety and ensure no implicit 'any' escapes.
+    - Verify server-side code handles missing database connections gracefully with proper error boundaries.
+
+  tools:
+    ast-grep:
+      enabled: true
+    shellcheck:
+      enabled: true
+    markdownlint:
+      enabled: true
+    biome:
+      enabled: true
+
+chat:
+  auto_reply: true

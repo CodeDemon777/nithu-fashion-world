@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { connectToDatabase, isDbConfigured } from "@/lib/mongodb";
 import ProductModel from "@/models/Product";
 import { PRODUCTS as DEFAULT_PRODUCTS } from "@/lib/data";
+import { applyRateLimit } from "@/lib/rate-limit";
+import { validateProductPayload } from "@/lib/validation";
 
 // GET /api/products - Get all products from MongoDB Atlas
-export async function GET() {
+export async function GET(req: Request) {
+  // 1. Rate Limiting Check
+  const rateLimitResponse = applyRateLimit(req, "READ");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     if (!isDbConfigured()) {
       return NextResponse.json({
@@ -77,15 +83,23 @@ export async function GET() {
 
 // POST /api/products - Add a new product to MongoDB Atlas
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
+  // 1. Rate Limiting Check
+  const rateLimitResponse = applyRateLimit(req, "WRITE");
+  if (rateLimitResponse) return rateLimitResponse;
 
-    if (!body.name || !body.price || !body.category) {
+  try {
+    const rawBody = await req.json();
+
+    // 2. Validate and Sanitize Input
+    const validation = validateProductPayload(rawBody);
+    if (!validation.isValid || !validation.sanitized) {
       return NextResponse.json(
-        { success: false, error: "Missing required fields: name, price, category" },
+        { success: false, errors: validation.errors },
         { status: 400 }
       );
     }
+
+    const { sanitized } = validation;
 
     if (!isDbConfigured()) {
       return NextResponse.json(
@@ -100,8 +114,8 @@ export async function POST(req: Request) {
     await connectToDatabase();
 
     const slug =
-      body.slug ||
-      body.name
+      rawBody.slug ||
+      sanitized.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "") +
@@ -109,20 +123,20 @@ export async function POST(req: Request) {
         Date.now();
 
     const newProduct = await ProductModel.create({
-      name: body.name.trim(),
+      name: sanitized.name,
       slug,
-      category: body.category,
-      categoryLabel: body.categoryLabel || body.category.toUpperCase(),
-      price: Number(body.price),
-      oldPrice: Number(body.oldPrice) || 0,
-      discount: Number(body.discount) || 0,
-      rating: Number(body.rating) || 5.0,
-      reviewsCount: Number(body.reviewsCount) || 1,
-      image: body.image || "/images/categories/sarees.jpg",
-      description: body.description || "Artisanal creation from Nithu Fashion World.",
-      features: body.features || ["Artisan Handcrafted", "Custom Fitting Available"],
-      isCustomizable: body.isCustomizable ?? true,
-      inStock: body.inStock ?? true,
+      category: sanitized.category,
+      categoryLabel: sanitized.categoryLabel,
+      price: sanitized.price,
+      oldPrice: sanitized.oldPrice,
+      discount: sanitized.discount,
+      rating: 5.0,
+      reviewsCount: 1,
+      image: sanitized.image,
+      description: sanitized.description,
+      features: sanitized.features,
+      isCustomizable: sanitized.isCustomizable,
+      inStock: sanitized.inStock,
     });
 
     const formatted = {
