@@ -3,9 +3,10 @@ import { connectToDatabase, isDbConfigured } from "@/lib/mongodb";
 import ProductModel from "@/models/Product";
 import mongoose from "mongoose";
 import { applyRateLimit } from "@/lib/rate-limit";
-import { sanitizeString, validateNumber } from "@/lib/validation";
+import { sanitizeString, validateNumber, validateImageUrl } from "@/lib/validation";
+import { verifyAdminAccess } from "@/lib/auth-guard";
 
-// PUT /api/products/[id] - Update product in MongoDB Atlas
+// PUT /api/products/[id] - Update product (Protected: Admin Only)
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
@@ -13,6 +14,10 @@ export async function PUT(
   // 1. Rate Limiting Check
   const rateLimitResponse = applyRateLimit(req, "WRITE");
   if (rateLimitResponse) return rateLimitResponse;
+
+  // 2. Broken Access Control Defense: Verify Admin Authorization
+  const authResponse = verifyAdminAccess(req);
+  if (authResponse) return authResponse;
 
   try {
     const { id } = params;
@@ -27,9 +32,10 @@ export async function PUT(
 
     await connectToDatabase();
 
-    const query = mongoose.Types.ObjectId.isValid(id)
-      ? { _id: id }
-      : { slug: sanitizeString(id, 100) };
+    const cleanId = sanitizeString(id, 100);
+    const query = mongoose.Types.ObjectId.isValid(cleanId)
+      ? { _id: cleanId }
+      : { slug: cleanId };
 
     // Sanitize updatable fields
     const sanitizedUpdate: Record<string, any> = {};
@@ -40,7 +46,12 @@ export async function PUT(
     if (body.discount !== undefined) sanitizedUpdate.discount = validateNumber(body.discount, 0, 100);
     if (body.inStock !== undefined) sanitizedUpdate.inStock = Boolean(body.inStock);
     if (body.description !== undefined) sanitizedUpdate.description = sanitizeString(body.description, 1500);
-    if (body.image !== undefined) sanitizedUpdate.image = sanitizeString(body.image, 400);
+
+    // SSRF image validation
+    if (body.image !== undefined) {
+      const imgRes = validateImageUrl(body.image);
+      if (imgRes.isValid) sanitizedUpdate.image = imgRes.value;
+    }
 
     const updated = await ProductModel.findOneAndUpdate(query, sanitizedUpdate, {
       new: true,
@@ -59,19 +70,19 @@ export async function PUT(
       message: "Product updated in MongoDB Atlas",
       product: {
         ...updated,
-        id: (updated as any)._id?.toString() || id,
+        id: (updated as any)._id?.toString() || cleanId,
       },
     });
   } catch (error: any) {
     console.error("PUT /api/products/[id] error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to update product" },
+      { success: false, error: "Failed to update product details." },
       { status: 500 }
     );
   }
 }
 
-// DELETE /api/products/[id] - Delete product from MongoDB Atlas
+// DELETE /api/products/[id] - Delete product (Protected: Admin Only)
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } }
@@ -79,6 +90,10 @@ export async function DELETE(
   // 1. Rate Limiting Check
   const rateLimitResponse = applyRateLimit(req, "WRITE");
   if (rateLimitResponse) return rateLimitResponse;
+
+  // 2. Broken Access Control Defense: Verify Admin Authorization
+  const authResponse = verifyAdminAccess(req);
+  if (authResponse) return authResponse;
 
   try {
     const { id } = params;
@@ -92,9 +107,10 @@ export async function DELETE(
 
     await connectToDatabase();
 
-    const query = mongoose.Types.ObjectId.isValid(id)
-      ? { _id: id }
-      : { slug: sanitizeString(id, 100) };
+    const cleanId = sanitizeString(id, 100);
+    const query = mongoose.Types.ObjectId.isValid(cleanId)
+      ? { _id: cleanId }
+      : { slug: cleanId };
 
     const deleted = await ProductModel.findOneAndDelete(query);
 
@@ -112,7 +128,7 @@ export async function DELETE(
   } catch (error: any) {
     console.error("DELETE /api/products/[id] error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to delete product" },
+      { success: false, error: "Failed to delete product." },
       { status: 500 }
     );
   }

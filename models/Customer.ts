@@ -23,6 +23,7 @@ const CustomerSchema = new Schema<ICustomerDocument>(
       type: String,
       required: [true, "Customer name is required"],
       trim: true,
+      maxlength: 100,
     },
     email: {
       type: String,
@@ -30,16 +31,19 @@ const CustomerSchema = new Schema<ICustomerDocument>(
       unique: true,
       lowercase: true,
       trim: true,
+      maxlength: 120,
       index: true,
     },
     phone: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 20,
     },
     password: {
       type: String,
-      default: "user123",
+      select: false, // Prevents password exposure in standard queries
+      maxlength: 256,
     },
     role: {
       type: String,
@@ -49,18 +53,22 @@ const CustomerSchema = new Schema<ICustomerDocument>(
     address: {
       type: String,
       default: "",
+      maxlength: 300,
     },
     city: {
       type: String,
       default: "Tamil Nadu",
+      maxlength: 100,
     },
     pincode: {
       type: String,
       default: "",
+      maxlength: 15,
     },
     avatar: {
       type: String,
       default: "",
+      maxlength: 500,
     },
     joinedDate: {
       type: String,
@@ -73,10 +81,12 @@ const CustomerSchema = new Schema<ICustomerDocument>(
     totalOrders: {
       type: Number,
       default: 0,
+      min: 0,
     },
     totalSpent: {
       type: Number,
       default: 0,
+      min: 0,
     },
   },
   {
@@ -86,6 +96,16 @@ const CustomerSchema = new Schema<ICustomerDocument>(
       transform: (_, ret: any) => {
         ret.id = ret._id ? ret._id.toString() : ret.id;
         delete ret.__v;
+        delete ret.password; // Enforce zero-password leakage
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_, ret: any) => {
+        ret.id = ret._id ? ret._id.toString() : ret.id;
+        delete ret.__v;
+        delete ret.password; // Enforce zero-password leakage
         return ret;
       },
     },

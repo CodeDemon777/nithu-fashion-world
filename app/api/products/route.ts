@@ -4,6 +4,7 @@ import ProductModel from "@/models/Product";
 import { PRODUCTS as DEFAULT_PRODUCTS } from "@/lib/data";
 import { applyRateLimit } from "@/lib/rate-limit";
 import { validateProductPayload } from "@/lib/validation";
+import { verifyAdminAccess } from "@/lib/auth-guard";
 
 // GET /api/products - Get all products from MongoDB Atlas
 export async function GET(req: Request) {
@@ -73,7 +74,7 @@ export async function GET(req: Request) {
       {
         success: false,
         source: "local-fallback",
-        error: error.message || "Failed to fetch from MongoDB Atlas",
+        error: "Unable to retrieve live catalog. Serving local cached collection.",
         products: DEFAULT_PRODUCTS,
       },
       { status: 200 }
@@ -81,16 +82,20 @@ export async function GET(req: Request) {
   }
 }
 
-// POST /api/products - Add a new product to MongoDB Atlas
+// POST /api/products - Add a new product (Protected: Admin Only)
 export async function POST(req: Request) {
   // 1. Rate Limiting Check
   const rateLimitResponse = applyRateLimit(req, "WRITE");
   if (rateLimitResponse) return rateLimitResponse;
 
+  // 2. Broken Access Control Defense: Verify Admin Authorization
+  const authResponse = verifyAdminAccess(req);
+  if (authResponse) return authResponse;
+
   try {
     const rawBody = await req.json();
 
-    // 2. Validate and Sanitize Input
+    // 3. Validate and Sanitize Input (prevents XSS, SSRF, prototype pollution)
     const validation = validateProductPayload(rawBody);
     if (!validation.isValid || !validation.sanitized) {
       return NextResponse.json(
@@ -155,7 +160,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("POST /api/products error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to create product" },
+      { success: false, error: "Failed to create product in database." },
       { status: 500 }
     );
   }

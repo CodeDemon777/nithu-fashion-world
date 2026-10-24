@@ -253,7 +253,12 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const seedDatabase = async (): Promise<boolean> => {
     try {
       showToast("Seeding MongoDB Atlas catalog...");
-      const res = await fetch("/api/seed", { method: "POST" });
+      const res = await fetch("/api/seed", {
+        method: "POST",
+        headers: {
+          "x-admin-token": "NITHU_ADMIN_SECRET_KEY_2026_ATLAS",
+        },
+      });
       const data = await res.json();
       if (res.ok && data.success) {
         showToast(data.message || "MongoDB Atlas seeded successfully! ✨");
@@ -357,7 +362,10 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const res = await fetch("/api/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": "NITHU_ADMIN_SECRET_KEY_2026_ATLAS",
+        },
         body: JSON.stringify(p),
       });
       if (res.ok) {
@@ -383,7 +391,10 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fetch(`/api/products/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": "NITHU_ADMIN_SECRET_KEY_2026_ATLAS",
+        },
         body: JSON.stringify(updated),
       });
     } catch (e) {
@@ -398,6 +409,9 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fetch(`/api/products/${id}`, {
         method: "DELETE",
+        headers: {
+          "x-admin-token": "NITHU_ADMIN_SECRET_KEY_2026_ATLAS",
+        },
       });
     } catch (e) {
       console.warn("Could not delete product from MongoDB Atlas:", e);

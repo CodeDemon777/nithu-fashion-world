@@ -3,15 +3,15 @@ import { connectToDatabase, isDbConfigured } from "@/lib/mongodb";
 import ProductModel from "@/models/Product";
 import CustomerModel from "@/models/Customer";
 import { PRODUCTS as DEFAULT_PRODUCTS } from "@/lib/data";
-
 import { applyRateLimit } from "@/lib/rate-limit";
+import { verifyAdminAccess } from "@/lib/auth-guard";
+import { hashPassword } from "@/lib/auth-security";
 
 const DEFAULT_CUSTOMERS = [
   {
     name: "Priya Sundaram",
     email: "priya@example.com",
     phone: "9876543210",
-    password: "user123",
     role: "customer" as const,
     address: "14/B, Gandhi Nagar, Near Saree Market",
     city: "Komarapalayam, Tamil Nadu",
@@ -25,7 +25,6 @@ const DEFAULT_CUSTOMERS = [
     name: "Divya Ramesh",
     email: "divya@example.com",
     phone: "7373848555",
-    password: "user123",
     role: "customer" as const,
     address: "42, Netaji Street",
     city: "Erode, Tamil Nadu",
@@ -39,7 +38,6 @@ const DEFAULT_CUSTOMERS = [
     name: "Nithu Admin",
     email: "admin@nithufashion.com",
     phone: "7373848555",
-    password: "admin123",
     role: "admin" as const,
     address: "Bazaar Street, Main Tailoring Unit",
     city: "Komarapalayam",
@@ -51,10 +49,15 @@ const DEFAULT_CUSTOMERS = [
   },
 ];
 
-// POST /api/seed - Seed database with full product catalog & initial customers
+// POST /api/seed - Seed database (Protected: Admin Only)
 export async function POST(req: Request) {
+  // 1. Rate Limiting Check
   const rateLimitResponse = applyRateLimit(req, "AUTH");
   if (rateLimitResponse) return rateLimitResponse;
+
+  // 2. Broken Access Control Defense: Verify Admin Authorization
+  const authResponse = verifyAdminAccess(req);
+  if (authResponse) return authResponse;
 
   try {
     if (!isDbConfigured()) {
@@ -89,12 +92,16 @@ export async function POST(req: Request) {
     }));
     const seededProducts = await ProductModel.insertMany(productDocs);
 
-    // 2. Seed Customers (skip if already exist by email)
+    // 2. Seed Customers with salted scrypt hashes
     let customersAdded = 0;
     for (const cust of DEFAULT_CUSTOMERS) {
       const exists = await CustomerModel.findOne({ email: cust.email });
       if (!exists) {
-        await CustomerModel.create(cust);
+        const passwordPlain = cust.role === "admin" ? "admin123" : "user123";
+        await CustomerModel.create({
+          ...cust,
+          password: hashPassword(passwordPlain),
+        });
         customersAdded++;
       }
     }
@@ -108,7 +115,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("POST /api/seed error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to seed database" },
+      { success: false, error: "Failed to complete database seed operation." },
       { status: 500 }
     );
   }

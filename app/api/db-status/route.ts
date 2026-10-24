@@ -6,7 +6,7 @@ import CustomerModel from "@/models/Customer";
 import OrderModel from "@/models/Order";
 import { applyRateLimit } from "@/lib/rate-limit";
 
-// GET /api/db-status - Check live MongoDB Atlas connection
+// GET /api/db-status - Check live MongoDB Atlas connection status securely
 export async function GET(req: Request) {
   const rateLimitResponse = applyRateLimit(req, "READ");
   if (rateLimitResponse) return rateLimitResponse;
@@ -40,12 +40,13 @@ export async function GET(req: Request) {
       OrderModel.countDocuments().catch(() => 0),
     ]);
 
+    // Data leak defense: Omit internal shard topology / hostnames
     return NextResponse.json({
       configured: true,
       connected: true,
       status: "connected",
-      database: mongoose.connection.name,
-      host: mongoose.connection.host,
+      database: "nithu_fashion_world",
+      cluster: "MongoDB Atlas (Secured Cloud Cluster)",
       stats: {
         productsCount,
         customersCount,
@@ -54,18 +55,13 @@ export async function GET(req: Request) {
       message: "Successfully connected to MongoDB Atlas!",
     });
   } catch (error: any) {
-    let friendlyMessage = error.message;
-    if (error.message?.includes("bad auth") || error.message?.includes("Authentication failed")) {
-      friendlyMessage = "Authentication failed: Check your database username and password in .env.local";
-    } else if (error.message?.includes("whitelist") || error.message?.includes("timed out")) {
-      friendlyMessage = "Connection timed out: Ensure IP 0.0.0.0/0 is added to Network Access in MongoDB Atlas.";
-    }
+    console.error("GET /api/db-status error:", error);
 
     return NextResponse.json({
       configured: true,
       connected: false,
       status: "error",
-      message: friendlyMessage,
+      message: "Database connection failed. Please verify Atlas network access and credentials.",
     });
   }
 }

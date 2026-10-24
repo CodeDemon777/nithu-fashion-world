@@ -3,6 +3,8 @@ import { connectToDatabase, isDbConfigured } from "@/lib/mongodb";
 import CustomerModel from "@/models/Customer";
 import { applyRateLimit } from "@/lib/rate-limit";
 import { validateCustomerPayload } from "@/lib/validation";
+import { hashPassword } from "@/lib/auth-security";
+import { verifyAdminAccess } from "@/lib/auth-guard";
 
 const DEFAULT_DEMO_CUSTOMERS = [
   {
@@ -49,11 +51,15 @@ const DEFAULT_DEMO_CUSTOMERS = [
   },
 ];
 
-// GET /api/customers - List all customers from MongoDB Atlas
+// GET /api/customers - List all customers (Protected: Admin Only)
 export async function GET(req: Request) {
   // 1. Rate Limiting Check
   const rateLimitResponse = applyRateLimit(req, "READ");
   if (rateLimitResponse) return rateLimitResponse;
+
+  // 2. Broken Access Control Defense: Verify Admin Authorization
+  const authResponse = verifyAdminAccess(req);
+  if (authResponse) return authResponse;
 
   try {
     if (!isDbConfigured()) {
@@ -65,17 +71,20 @@ export async function GET(req: Request) {
     }
 
     await connectToDatabase();
-    let customers: any[] = await CustomerModel.find({}).sort({ createdAt: -1 }).lean();
+    let customers: any[] = await CustomerModel.find({})
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .lean();
 
     // If MongoDB is connected but has no customers yet, auto-seed sample demo accounts
     if (customers.length === 0) {
-      console.log("No customers found in MongoDB. Auto-seeding initial customer accounts...");
+      console.log("No customers found in MongoDB. Auto-seeding initial customer accounts with salted scrypt hashes...");
       const seeded = await CustomerModel.insertMany([
         {
           name: "Priya Sundaram",
           email: "priya@example.com",
           phone: "9876543210",
-          password: "user123",
+          password: hashPassword("user123"),
           role: "customer",
           address: "14/B, Gandhi Nagar, Near Saree Market",
           city: "Komarapalayam, Tamil Nadu",
@@ -89,7 +98,7 @@ export async function GET(req: Request) {
           name: "Divya Ramesh",
           email: "divya@example.com",
           phone: "7373848555",
-          password: "user123",
+          password: hashPassword("user123"),
           role: "customer",
           address: "42, Netaji Street",
           city: "Erode, Tamil Nadu",
@@ -103,7 +112,7 @@ export async function GET(req: Request) {
           name: "Nithu Admin",
           email: "admin@nithufashion.com",
           phone: "7373848555",
-          password: "admin123",
+          password: hashPassword("admin123"),
           role: "admin",
           address: "Bazaar Street, Main Tailoring Unit",
           city: "Komarapalayam",
@@ -115,15 +124,22 @@ export async function GET(req: Request) {
         },
       ]);
 
-      customers = seeded.map((doc) => ({
-        ...doc.toObject(),
-        id: doc._id.toString(),
-      }));
+      customers = seeded.map((doc) => {
+        const obj = doc.toObject();
+        delete obj.password;
+        return {
+          ...obj,
+          id: doc._id.toString(),
+        };
+      });
     } else {
-      customers = customers.map((c: any) => ({
-        ...c,
-        id: c._id ? c._id.toString() : c.id,
-      }));
+      customers = customers.map((c: any) => {
+        delete c.password;
+        return {
+          ...c,
+          id: c._id ? c._id.toString() : c.id,
+        };
+      });
     }
 
     return NextResponse.json({
@@ -138,15 +154,15 @@ export async function GET(req: Request) {
       {
         success: false,
         source: "local-fallback",
-        error: error.message || "Failed to fetch customers",
+        error: "Unable to retrieve customer records. Please try again later.",
         customers: DEFAULT_DEMO_CUSTOMERS,
       },
-      { status: 200 }
+      { status: 500 }
     );
   }
 }
 
-// POST /api/customers - Register or create customer in MongoDB Atlas
+// POST /api/customers - Register customer in MongoDB Atlas
 export async function POST(req: Request) {
   // 1. Strict Auth Rate Limiting Check (prevents bot spam & credential stuffing)
   const rateLimitResponse = applyRateLimit(req, "AUTH");
@@ -167,7 +183,6 @@ export async function POST(req: Request) {
     const { sanitized } = validation;
 
     if (!isDbConfigured()) {
-      // Return successful local fallback response
       const fallbackUser = {
         id: "usr-" + Date.now(),
         name: sanitized.name,
@@ -191,7 +206,7 @@ export async function POST(req: Request) {
 
     await connectToDatabase();
 
-    // Check if customer already exists
+    // Check if customer already exists (NoSQL safe string comparison)
     const existing = await CustomerModel.findOne({ email: sanitized.email });
     if (existing) {
       return NextResponse.json(
@@ -203,11 +218,14 @@ export async function POST(req: Request) {
       );
     }
 
+    // Hash password with salted scrypt to eliminate weak authentication
+    const hashedPassword = hashPassword(sanitized.password || "user123");
+
     const newCustomer = await CustomerModel.create({
       name: sanitized.name,
       email: sanitized.email,
       phone: sanitized.phone,
-      password: sanitized.password || "user123",
+      password: hashedPassword,
       role: sanitized.email.includes("admin") ? "admin" : "customer",
       address: sanitized.address,
       city: sanitized.city,
@@ -239,7 +257,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("POST /api/customers error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to register customer" },
+      { success: false, error: "An unexpected error occurred during customer registration." },
       { status: 500 }
     );
   }

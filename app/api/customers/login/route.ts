@@ -3,6 +3,7 @@ import { connectToDatabase, isDbConfigured } from "@/lib/mongodb";
 import CustomerModel from "@/models/Customer";
 import { applyRateLimit } from "@/lib/rate-limit";
 import { validateEmail, sanitizeString } from "@/lib/validation";
+import { hashPassword, verifyPassword } from "@/lib/auth-security";
 
 // POST /api/customers/login - Login customer with MongoDB Atlas
 export async function POST(req: Request) {
@@ -52,15 +53,18 @@ export async function POST(req: Request) {
 
     await connectToDatabase();
 
-    const customer = await CustomerModel.findOne({ email: cleanEmail });
+    // Select password field explicitly since select: false is on schema
+    const customer = await CustomerModel.findOne({ email: cleanEmail }).select("+password");
 
     if (!customer) {
-      // Auto-create customer if logging in first time
+      // Auto-create customer if logging in first time with salted scrypt hash
       const isDemoAdmin = cleanEmail.includes("admin");
+      const hashedPassword = hashPassword(cleanPassword);
+
       const created = await CustomerModel.create({
         name: cleanEmail.split("@")[0].toUpperCase(),
         email: cleanEmail,
-        password: cleanPassword,
+        password: hashedPassword,
         role: isDemoAdmin ? "admin" : "customer",
         city: "Tamil Nadu",
         joinedDate: new Date().toLocaleDateString("en-US", {
@@ -82,12 +86,21 @@ export async function POST(req: Request) {
       });
     }
 
-    // Verify password if set
-    if (customer.password && customer.password !== cleanPassword) {
-      return NextResponse.json(
-        { success: false, error: "Incorrect password. Please try again." },
-        { status: 401 }
-      );
+    // Verify password using timing-safe salted scrypt verification
+    if (customer.password) {
+      const verification = verifyPassword(cleanPassword, customer.password);
+      if (!verification.isValid) {
+        return NextResponse.json(
+          { success: false, error: "Incorrect password. Please try again." },
+          { status: 401 }
+        );
+      }
+
+      // Seamless security upgrade: If user had legacy plain text, rehash to salted scrypt
+      if (verification.needsRehash) {
+        customer.password = hashPassword(cleanPassword);
+        await customer.save().catch((e) => console.warn("Could not upgrade password hash:", e));
+      }
     }
 
     const safe = {
@@ -104,7 +117,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("POST /api/customers/login error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Login failed" },
+      { success: false, error: "Authentication service unavailable. Please try again." },
       { status: 500 }
     );
   }

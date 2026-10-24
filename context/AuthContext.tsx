@@ -78,7 +78,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshCustomers = useCallback(async () => {
     setIsLoadingCustomers(true);
     try {
-      const res = await fetch("/api/customers");
+      const res = await fetch("/api/customers", {
+        headers: {
+          "x-admin-token": "NITHU_ADMIN_SECRET_KEY_2026_ATLAS",
+        },
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.customers && Array.isArray(data.customers)) {
