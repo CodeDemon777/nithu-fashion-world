@@ -36,15 +36,15 @@ export const InstagramSection: React.FC = () => {
             </div>
           </div>
 
-          {/* 7 Image Thumbnails Grid */}
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2.5 flex-1 w-full max-w-[760px]">
+          {/* 7 Image Thumbnails Grid / Mobile Carousel */}
+          <div className="flex sm:grid sm:grid-cols-4 md:grid-cols-7 gap-2.5 flex-1 w-full max-w-[760px] overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
             {INSTAGRAM_POSTS.map((post) => (
               <a
                 key={post.id}
                 href="https://www.instagram.com/nithufashionworld?stkn=MTBrd253OWQ0Nmd2dA=="
                 target="_blank"
                 rel="noreferrer"
-                className="group relative aspect-square rounded-xl overflow-hidden bg-cream-soft border border-blush/60 shadow-sm"
+                className="group relative aspect-square rounded-xl overflow-hidden bg-cream-soft border border-blush/60 shadow-sm flex-shrink-0 w-20 sm:w-auto"
               >
                 <img
                   src={post.image}

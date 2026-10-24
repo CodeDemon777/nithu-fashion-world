@@ -42,12 +42,12 @@ export const Footer: React.FC = () => {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
         
         {/* Main 5 Columns Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-8 pb-12 border-b border-burgundy-rich/80">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-6 lg:gap-6 xl:gap-8 pb-12 border-b border-burgundy-rich/80">
           
-          {/* Col 1: Brand & Bio (4 cols on lg) */}
-          <div className="lg:col-span-4 space-y-4">
-            <BrandLogo variant="light" size="md" />
-            <p className="text-xs text-blush-soft/80 leading-relaxed font-sans max-w-sm pt-2">
+          {/* Col 1: Brand & Bio (3 cols on lg) */}
+          <div className="lg:col-span-3 space-y-3">
+            <BrandLogo variant="light" size="sm" />
+            <p className="text-xs text-blush-soft/80 leading-relaxed font-sans max-w-xs pt-1">
               Empowering your elegance with handcrafted luxury sarees, custom bridal blouse tailoring, exquisite Aari craftsmanship, and personalized handcrafted gifts in Tamil Nadu.
             </p>
             <div className="pt-2 text-xs text-gold-light/90 font-medium">
@@ -134,8 +134,8 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Col 4: Contact Us (2 cols on lg) */}
-          <div className="lg:col-span-2 space-y-3">
+          {/* Col 4: Contact Us (3 cols on lg) */}
+          <div className="lg:col-span-3 space-y-3">
             <h4
               className="text-base font-serif text-gold-light tracking-wider font-semibold"
               style={{ fontFamily: "var(--font-cormorant)" }}
@@ -145,8 +145,8 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2.5 text-xs text-cream-ivory/90">
               <li className="flex items-start gap-2">
                 <Phone className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
-                <a href="tel:9585477733" className="hover:text-gold transition-colors">
-                  9585477733
+                <a href="tel:7373848555" className="hover:text-gold transition-colors">
+                  7373848555
                 </a>
               </li>
               <li className="flex items-center gap-2">
@@ -231,7 +231,7 @@ export const Footer: React.FC = () => {
                 <Facebook className="w-4 h-4" />
               </a>
               <a
-                href="https://wa.me/919585477733"
+                href="https://wa.me/917373848555"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="WhatsApp"

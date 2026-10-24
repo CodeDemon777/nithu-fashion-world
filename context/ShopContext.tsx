@@ -1,15 +1,36 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { Product, CartItem, Order, TailoringInquiry } from "@/lib/types";
 import { PRODUCTS as INITIAL_PRODUCTS } from "@/lib/data";
 import confetti from "canvas-confetti";
 
+export interface DbStatusInfo {
+  configured: boolean;
+  connected: boolean;
+  status: string;
+  database?: string;
+  host?: string;
+  message?: string;
+  stats?: {
+    productsCount: number;
+    customersCount: number;
+    ordersCount: number;
+  };
+}
+
 interface ShopContextType {
   products: Product[];
-  addProduct: (product: Product) => void;
-  updateProduct: (id: string, updated: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
+  isLoadingProducts: boolean;
+  refreshProducts: () => Promise<void>;
+
+  dbStatus: DbStatusInfo | null;
+  refreshDbStatus: () => Promise<void>;
+  seedDatabase: () => Promise<boolean>;
+
+  addProduct: (product: Product) => Promise<void>;
+  updateProduct: (id: string, updated: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
 
   cart: CartItem[];
   wishlist: string[]; // product IDs
@@ -28,6 +49,11 @@ interface ShopContextType {
   setIsCartOpen: (open: boolean) => void;
   isWishlistOpen: boolean;
   setIsWishlistOpen: (open: boolean) => void;
+  isWhatsAppModalOpen: boolean;
+  setIsWhatsAppModalOpen: (open: boolean) => void;
+  directCheckoutItem: { product: Product; quantity: number; selectedSize: string } | null;
+  setDirectCheckoutItem: (item: { product: Product; quantity: number; selectedSize: string } | null) => void;
+  openWhatsAppCheckout: (directItem?: { product: Product; quantity: number; selectedSize: string }) => void;
 
   quickViewProduct: Product | null;
   setQuickViewProduct: (product: Product | null) => void;
@@ -94,7 +120,7 @@ const INITIAL_ORDERS: Order[] = [
     orderNumber: "NFW-2026-9784",
     customerName: "Divya Ramesh",
     customerEmail: "divya@example.com",
-    customerPhone: "9585477733",
+    customerPhone: "7373848555",
     deliveryAddress: "42, Netaji Street, Erode, Tamil Nadu",
     items: [
       {
@@ -152,6 +178,9 @@ const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
+  const [dbStatus, setDbStatus] = useState<DbStatusInfo | null>(null);
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
@@ -159,6 +188,8 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [directCheckoutItem, setDirectCheckoutItem] = useState<{ product: Product; quantity: number; selectedSize: string } | null>(null);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [bookingPreselectService, setBookingPreselectService] = useState("");
@@ -166,7 +197,81 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [searchQuery, setSearchQuery] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Load from LocalStorage
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3200);
+  };
+
+  const triggerConfetti = () => {
+    try {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#57000D", "#C89B5A", "#F3D7CE", "#E5C78C"],
+      });
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  // Fetch products from MongoDB Atlas
+  const refreshProducts = useCallback(async () => {
+    setIsLoadingProducts(true);
+    try {
+      const res = await fetch("/api/products");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.products && Array.isArray(data.products) && data.products.length > 0) {
+          setProducts(data.products);
+          localStorage.setItem("nithu_custom_products", JSON.stringify(data.products));
+        }
+      }
+    } catch (e) {
+      console.warn("Could not fetch products from /api/products:", e);
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  }, []);
+
+  // Fetch live database connection status
+  const refreshDbStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/db-status");
+      if (res.ok) {
+        const data: DbStatusInfo = await res.json();
+        setDbStatus(data);
+      }
+    } catch (e) {
+      console.warn("Could not fetch /api/db-status:", e);
+    }
+  }, []);
+
+  // One-click database seed
+  const seedDatabase = async (): Promise<boolean> => {
+    try {
+      showToast("Seeding MongoDB Atlas catalog...");
+      const res = await fetch("/api/seed", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(data.message || "MongoDB Atlas seeded successfully! ✨");
+        triggerConfetti();
+        await refreshProducts();
+        await refreshDbStatus();
+        return true;
+      } else {
+        showToast(data.error || "Failed to seed database. Check your .env.local");
+        return false;
+      }
+    } catch (e: any) {
+      showToast("Error seeding database: " + e.message);
+      return false;
+    }
+  };
+
+  // Load from LocalStorage on mount
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem("nithu_cart");
@@ -186,7 +291,11 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       console.error("Failed to parse storage:", e);
     }
-  }, []);
+
+    // Attempt to load from MongoDB Atlas
+    refreshProducts();
+    refreshDbStatus();
+  }, [refreshProducts, refreshDbStatus]);
 
   // Save to LocalStorage
   useEffect(() => {
@@ -229,41 +338,70 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [products]);
 
-  const showToast = (message: string) => {
-    setToastMessage(message);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3200);
+  const openWhatsAppCheckout = (directItem?: { product: Product; quantity: number; selectedSize: string }) => {
+    if (directItem) {
+      setDirectCheckoutItem(directItem);
+    } else {
+      setDirectCheckoutItem(null);
+    }
+    setIsCartOpen(false);
+    setIsWhatsAppModalOpen(true);
   };
 
-  const triggerConfetti = () => {
+  const addProduct = async (p: Product) => {
+    // 1. Optimistic local state update
+    setProducts((prev) => [p, ...prev]);
+    showToast(`Product "${p.name}" added to catalog!`);
+
+    // 2. Persist to MongoDB Atlas
     try {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ["#57000D", "#C89B5A", "#F3D7CE", "#E5C78C"],
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(p),
       });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.product) {
+          // Replace optimistic product with returned MongoDB document
+          setProducts((prev) =>
+            prev.map((item) => (item.id === p.id ? data.product : item))
+          );
+        }
+      }
     } catch (e) {
-      // ignore
+      console.warn("Could not persist product to MongoDB Atlas:", e);
     }
   };
 
-  const addProduct = (p: Product) => {
-    setProducts((prev) => [p, ...prev]);
-    showToast(`Product "${p.name}" added to catalog!`);
-  };
-
-  const updateProduct = (id: string, updated: Partial<Product>) => {
+  const updateProduct = async (id: string, updated: Partial<Product>) => {
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, ...updated } : p))
     );
     showToast("Product catalog updated successfully!");
+
+    try {
+      await fetch(`/api/products/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+    } catch (e) {
+      console.warn("Could not sync product update to MongoDB Atlas:", e);
+    }
   };
 
-  const deleteProduct = (id: string) => {
+  const deleteProduct = async (id: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
     showToast("Product deleted from catalog");
+
+    try {
+      await fetch(`/api/products/${id}`, {
+        method: "DELETE",
+      });
+    } catch (e) {
+      console.warn("Could not delete product from MongoDB Atlas:", e);
+    }
   };
 
   const addToCart = (product: Product, quantity = 1, selectedSize?: string) => {
@@ -331,6 +469,16 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       estimatedDelivery: "Within 4-6 Days",
     };
     setOrders((prev) => [newOrder, ...prev]);
+
+    // Async record order in MongoDB Atlas
+    fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newOrder),
+    }).catch((err) => {
+      console.warn("Could not save order to MongoDB Atlas:", err);
+    });
+
     return newOrder;
   };
 
@@ -362,6 +510,11 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <ShopContext.Provider
       value={{
         products,
+        isLoadingProducts,
+        refreshProducts,
+        dbStatus,
+        refreshDbStatus,
+        seedDatabase,
         addProduct,
         updateProduct,
         deleteProduct,
@@ -380,6 +533,11 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsCartOpen,
         isWishlistOpen,
         setIsWishlistOpen,
+        isWhatsAppModalOpen,
+        setIsWhatsAppModalOpen,
+        directCheckoutItem,
+        setDirectCheckoutItem,
+        openWhatsAppCheckout,
         quickViewProduct,
         setQuickViewProduct,
         isBookingModalOpen,

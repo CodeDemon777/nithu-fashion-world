@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { BrandLogo } from "@/components/ui/BrandLogo";
 import { FloralAccent } from "@/components/ui/FloralAccent";
 import { useShop } from "@/context/ShopContext";
-import { Diamond, Heart, Gift, Truck, ArrowRight, Sparkles } from "lucide-react";
+import { Diamond, Heart, Gift, Truck, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
 
 export const Hero: React.FC = () => {
   const { setIsBookingModalOpen } = useShop();
@@ -64,54 +64,45 @@ export const Hero: React.FC = () => {
             <Heart className="w-3.5 h-3.5 fill-gold-light text-gold-light animate-pulse" />
           </div>
 
-          {/* Left Content Area (Hero Main Text) */}
-          <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-start space-y-5 sm:space-y-6 lg:pr-6">
+          {/* Left Content Area (Full Official Logo & Brand Presentation) */}
+          <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:pr-6">
             
-            {/* Brand Logo Crest */}
-            <div className="inline-block p-1 bg-burgundy-deep/40 rounded-2xl border border-gold/20 backdrop-blur-sm shadow-gold">
-              <BrandLogo variant="light" size="md" />
+            {/* Full Official Brand Logo Showcase Box - Completely Visible, Zero Cropping */}
+            <div className="relative group w-full max-w-[380px] sm:max-w-[420px] rounded-3xl overflow-hidden bg-gradient-to-b from-[#4A0009]/90 to-[#2A0005]/95 border-2 border-gold/40 shadow-2xl p-4 sm:p-5 backdrop-blur-md transition-all duration-300 hover:border-gold hover:shadow-gold">
+              {/* Subtle Ambient Gold Glow */}
+              <div className="absolute inset-0 bg-gold/5 rounded-3xl pointer-events-none group-hover:bg-gold/10 transition-all" />
+              
+              {/* Official Brand Logo - 100% Full View */}
+              <img
+                src="/images/logo/logo.png"
+                alt="NITHU FASHION WORLD Official Brand Logo - Stitching Dreams, Creating You"
+                className="w-full h-auto object-contain max-h-[340px] drop-shadow-[0_8px_20px_rgba(200,155,90,0.35)] select-none"
+              />
             </div>
 
-            {/* Sub-eyebrow */}
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-[1px] bg-gold-light/60"></span>
-              <span
-                className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-gold-light font-semibold"
-                style={{ fontFamily: "var(--font-montserrat)" }}
-              >
-                TRADITIONAL CRAFTSMANSHIP FOR A BRIGHTER YOU
-              </span>
-            </div>
-
-            {/* Main Grand Headlines */}
-            <div className="space-y-1">
-              <h1
-                className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tight text-cream font-normal leading-[1.08]"
-                style={{ fontFamily: "var(--font-cormorant)" }}
-              >
-                Stitching Dreams,
-              </h1>
-              <div
-                className="text-5xl sm:text-6xl lg:text-7xl font-script text-gold-light leading-none -mt-2 sm:-mt-3 drop-shadow-md"
-                style={{ fontFamily: "var(--font-allura)" }}
-              >
-                {currentSlide.headlineScript}
+            {/* Sub-eyebrow & Tagline */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-center lg:justify-start gap-2">
+                <span className="w-8 h-[1px] bg-gold-light/60"></span>
+                <span
+                  className="text-[11px] sm:text-xs tracking-[0.25em] uppercase text-gold-light font-semibold"
+                  style={{ fontFamily: "var(--font-montserrat)" }}
+                >
+                  TRADITIONAL CRAFTSMANSHIP FOR A BRIGHTER YOU
+                </span>
+                <span className="w-8 h-[1px] bg-gold-light/60"></span>
               </div>
-            </div>
 
-            {/* Category Sub-tag */}
-            <p
-              className="text-sm sm:text-base text-blush-soft/90 tracking-wider font-medium"
-              style={{ fontFamily: "var(--font-montserrat)" }}
-            >
-              {currentSlide.tag}
-            </p>
+              <p className="text-xs sm:text-sm text-blush-soft/90 max-w-md font-medium tracking-wide">
+                Bridal Silk Sarees • Custom Tailored Blouses • Handcrafted Aari Work & Bespoke Gifts
+              </p>
+            </div>
 
             {/* Hero CTAs */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-1">
               <a
                 href="#featured-collection"
-                className="gold-shimmer-btn text-burgundy-deep font-semibold text-xs sm:text-sm px-7 py-3.5 rounded-full shadow-gold hover:shadow-luxury-lg flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                className="gold-shimmer-btn text-burgundy-deep font-bold text-xs sm:text-sm px-6 sm:px-7 py-3 sm:py-3.5 rounded-full shadow-gold hover:shadow-luxury-lg flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 <span>Explore Collections</span>
                 <ArrowRight className="w-4 h-4 text-burgundy-deep" />
@@ -119,43 +110,53 @@ export const Hero: React.FC = () => {
 
               <button
                 onClick={() => setIsBookingModalOpen(true)}
-                className="bg-transparent hover:bg-white/10 text-cream text-xs sm:text-sm font-semibold px-6 py-3.5 rounded-full border border-gold/60 hover:border-gold transition-all flex items-center gap-2"
+                className="bg-transparent hover:bg-white/10 text-cream text-xs sm:text-sm font-semibold px-5 sm:px-6 py-3 sm:py-3.5 rounded-full border border-gold/60 hover:border-gold transition-all flex items-center gap-2"
               >
                 <Sparkles className="w-4 h-4 text-gold-light" />
                 <span>Explore Tailoring</span>
               </button>
+
+              <a
+                href="https://wa.me/917373848555?text=Hello%20Nithu%20Fashion%20World,%20I%20would%20like%20to%20order%20sarees%20and%20tailoring."
+                target="_blank"
+                rel="noreferrer"
+                className="bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs sm:text-sm font-bold px-5 py-3 sm:py-3.5 rounded-full shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>WhatsApp Order</span>
+              </a>
             </div>
           </div>
 
-          {/* Right Content Area (Model Photography Showcase) */}
-          <div className="lg:col-span-5 xl:col-span-5 relative flex justify-center lg:justify-end">
+          {/* Right Content Area (hero-model.jpg Showcased Completely Separately) */}
+          <div className="lg:col-span-6 xl:col-span-5 relative flex flex-col items-center lg:items-end justify-center mt-6 lg:mt-0">
             
             {/* Top Right Script Flourish */}
-            <div className="absolute -top-6 right-4 sm:right-10 z-20 text-right select-none hidden sm:block">
+            <div className="mb-3 text-center lg:text-right select-none hidden sm:block">
               <div
                 className="text-xl sm:text-2xl font-script text-gold-light leading-tight drop-shadow"
                 style={{ fontFamily: "var(--font-allura)" }}
               >
                 Style Tradition Creativity You
               </div>
-              <div className="flex justify-end pr-2 pt-0.5">
-                <Heart className="w-3 h-3 fill-gold-light text-gold-light" />
+              <div className="flex justify-center lg:justify-end pr-2 pt-0.5">
+                <Heart className="w-3.5 h-3.5 fill-gold-light text-gold-light animate-pulse" />
               </div>
             </div>
 
-            {/* Arch-Framed Model Image Container */}
-            <div className="relative w-full max-w-[380px] sm:max-w-[420px] aspect-[3/4] rounded-t-[140px] rounded-b-3xl overflow-hidden border-2 border-gold/40 shadow-2xl bg-burgundy-deep/60 group">
+            {/* Arch-Framed Model Image Container - Standalone Showcase */}
+            <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[380px] aspect-[3/4] rounded-t-[140px] rounded-b-3xl overflow-hidden border-2 border-gold/60 shadow-2xl bg-burgundy-deep/80 group">
               <img
                 src={currentSlide.image}
-                alt="Nithu Fashion World Bridal Model"
+                alt="Nithu Fashion World Bridal Model - Saree & Aari Work Blouse"
                 className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
               />
 
               {/* Gradient Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-burgundy-deep/90 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2A0005]/95 via-transparent to-transparent pointer-events-none" />
 
               {/* Bottom Floating Pill on Image */}
-              <div className="absolute bottom-4 left-4 right-4 bg-[#3D0008]/85 backdrop-blur-md border border-gold/40 rounded-xl p-3 flex items-center justify-between shadow-lg">
+              <div className="absolute bottom-4 left-4 right-4 bg-[#3D0008]/90 backdrop-blur-md border border-gold/40 rounded-xl p-3 flex items-center justify-between shadow-lg">
                 <div className="text-left">
                   <div className="text-[10px] uppercase tracking-wider text-gold font-semibold">
                     Signature Craft
@@ -175,14 +176,15 @@ export const Hero: React.FC = () => {
             </div>
 
             {/* Slider Switcher (01 - 02 - 03) */}
-            <div className="absolute -bottom-10 right-4 sm:right-8 flex items-center gap-3 text-xs font-medium text-gold-light select-none">
+            <div className="mt-4 flex items-center gap-3 text-xs font-medium text-gold-light select-none">
+              <span className="text-[10px] uppercase text-gold/70 tracking-wider">Collections:</span>
               {[1, 2, 3].map((num) => (
                 <button
                   key={num}
                   onClick={() => setActiveSlide(num)}
-                  className={`transition-all py-1 ${
+                  className={`transition-all py-0.5 px-1.5 rounded ${
                     activeSlide === num
-                      ? "text-gold font-bold scale-110 border-b border-gold"
+                      ? "text-gold font-bold bg-gold/20 border border-gold/40 scale-105"
                       : "text-cream-ivory/60 hover:text-gold-light"
                   }`}
                 >

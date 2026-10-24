@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useShop } from "@/context/ShopContext";
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Sparkles, MessageCircle } from "lucide-react";
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -15,15 +15,13 @@ export const CartDrawer: React.FC = () => {
     clearCart,
     triggerConfetti,
     showToast,
+    openWhatsAppCheckout,
   } = useShop();
 
   if (!isCartOpen) return null;
 
   const handleCheckout = () => {
-    triggerConfetti();
-    showToast("🎉 Order request placed! Our team will contact you on WhatsApp/Phone.");
-    clearCart();
-    setIsCartOpen(false);
+    openWhatsAppCheckout();
   };
 
   return (
@@ -35,8 +33,8 @@ export const CartDrawer: React.FC = () => {
       />
 
       {/* Drawer */}
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-[#FFFBF7] shadow-2xl flex flex-col border-l border-blush">
+      <div className="absolute inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
+        <div className="w-screen max-w-full sm:max-w-md bg-[#FFFBF7] shadow-2xl flex flex-col border-l border-blush">
           
           {/* Header */}
           <div className="p-5 border-b border-blush/80 flex items-center justify-between bg-white">
@@ -162,15 +160,16 @@ export const CartDrawer: React.FC = () => {
 
               <button
                 onClick={handleCheckout}
-                className="w-full py-3.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold uppercase tracking-wider rounded-full shadow-gold hover:shadow-luxury-lg flex items-center justify-center gap-2 transition-all"
+                className="w-full py-3.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-full shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
-                <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4 text-gold-light" />
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>Proceed to WhatsApp Checkout</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
 
               <div className="flex items-center justify-center gap-2 text-[10px] text-charcoal-muted">
-                <ShieldCheck className="w-3.5 h-3.5 text-gold" />
-                <span>100% Safe & Secure Payments via Razorpay / UPI</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Direct WhatsApp Confirmation & UPI Payments</span>
               </div>
             </div>
           )}

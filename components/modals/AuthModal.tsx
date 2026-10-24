@@ -24,10 +24,11 @@ export const AuthModal: React.FC = () => {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isAuthModalOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -36,16 +37,38 @@ export const AuthModal: React.FC = () => {
         setError("Please enter your email and password.");
         return;
       }
-      login(email, password);
-      showToast("Welcome back! ✨");
+      setIsSubmitting(true);
+      try {
+        const success = await login(email, password);
+        if (success) {
+          showToast("Welcome back to NITHU FASHION WORLD! ✨");
+        } else {
+          setError("Invalid credentials. Please try again.");
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to log in.");
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
       if (!name || !email || !password) {
         setError("Please fill in all required fields.");
         return;
       }
-      signup(name, email, password, phone);
-      triggerConfetti();
-      showToast("Account created successfully! Welcome to NITHU FASHION WORLD ✨");
+      setIsSubmitting(true);
+      try {
+        const success = await signup(name, email, password, phone);
+        if (success) {
+          triggerConfetti();
+          showToast("Account created in MongoDB Atlas! Welcome ✨");
+        } else {
+          setError("Failed to create account. Please check your details.");
+        }
+      } catch (err: any) {
+        setError(err.message || "Signup failed.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -198,10 +221,17 @@ export const AuthModal: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold uppercase tracking-wider rounded-full shadow-md hover:shadow-luxury transition-all flex items-center justify-center gap-2 mt-2"
+            disabled={isSubmitting}
+            className="w-full py-3.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold uppercase tracking-wider rounded-full shadow-md hover:shadow-luxury transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
           >
-            <span>{authModalTab === "login" ? "Sign In" : "Create Account"}</span>
-            <ArrowRight className="w-4 h-4 text-gold-light" />
+            {isSubmitting ? (
+              <span>Connecting to MongoDB Atlas...</span>
+            ) : (
+              <>
+                <span>{authModalTab === "login" ? "Sign In" : "Create Account"}</span>
+                <ArrowRight className="w-4 h-4 text-gold-light" />
+              </>
+            )}
           </button>
         </form>
 

@@ -8,6 +8,9 @@ import { CartDrawer } from "@/components/modals/CartDrawer";
 import { WishlistDrawer } from "@/components/modals/WishlistDrawer";
 import { QuickViewModal } from "@/components/modals/QuickViewModal";
 import { BookServiceModal } from "@/components/modals/BookServiceModal";
+import { WhatsAppCheckoutModal } from "@/components/modals/WhatsAppCheckoutModal";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { FloatingWhatsApp } from "@/components/ui/FloatingWhatsApp";
 import { ToastNotification } from "@/components/ui/ToastNotification";
 
 export const viewport = {
@@ -51,8 +54,8 @@ export default function RootLayout({
             {/* Sticky Navbar */}
             <Navbar />
 
-            {/* Page Content */}
-            <main className="flex-1">{children}</main>
+            {/* Page Content with safe padding for mobile bottom nav */}
+            <main className="flex-1 pb-16 md:pb-0">{children}</main>
 
             {/* Luxury Footer */}
             <Footer />
@@ -62,8 +65,13 @@ export default function RootLayout({
             <WishlistDrawer />
             <QuickViewModal />
             <BookServiceModal />
+            <WhatsAppCheckoutModal />
             <AuthModal />
             <ToastNotification />
+
+            {/* Mobile Bottom Navigation Bar & WhatsApp Widget */}
+            <MobileBottomNav />
+            <FloatingWhatsApp />
           </ShopProvider>
         </AuthProvider>
       </body>

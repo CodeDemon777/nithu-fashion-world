@@ -3,14 +3,14 @@
 import React from "react";
 import { Product } from "@/lib/types";
 import { useShop } from "@/context/ShopContext";
-import { Heart, ShoppingBag, Eye, Star } from "lucide-react";
+import { Heart, ShoppingBag, Eye, Star, MessageCircle } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart, toggleWishlist, isInWishlist, setQuickViewProduct } = useShop();
+  const { addToCart, toggleWishlist, isInWishlist, setQuickViewProduct, openWhatsAppCheckout } = useShop();
   const wishlisted = isInWishlist(product.id);
 
   return (
@@ -111,14 +111,35 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             )}
           </div>
 
-          {/* Add to Cart Circular Icon Button */}
-          <button
-            onClick={() => addToCart(product)}
-            aria-label={`Add ${product.name} to cart`}
-            className="w-8 h-8 rounded-full bg-burgundy hover:bg-burgundy-deep text-cream flex items-center justify-center shadow-sm hover:shadow-md transition-transform transform active:scale-95 hover:scale-105"
-          >
-            <ShoppingBag className="w-3.5 h-3.5 text-gold-light" />
-          </button>
+          {/* Action Buttons: WhatsApp Order + Add to Cart */}
+          <div className="flex items-center gap-1.5">
+            {/* WhatsApp Direct Buy */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openWhatsAppCheckout({
+                  product,
+                  quantity: 1,
+                  selectedSize: "Standard / Free Size",
+                });
+              }}
+              title="Order on WhatsApp"
+              aria-label={`Order ${product.name} on WhatsApp`}
+              className="w-8 h-8 rounded-full bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center shadow-sm hover:shadow-md transition-all transform active:scale-95 hover:scale-105"
+            >
+              <MessageCircle className="w-4 h-4 fill-current" />
+            </button>
+
+            {/* Add to Cart Circular Icon Button */}
+            <button
+              onClick={() => addToCart(product)}
+              title="Add to Cart"
+              aria-label={`Add ${product.name} to cart`}
+              className="w-8 h-8 rounded-full bg-burgundy hover:bg-burgundy-deep text-cream flex items-center justify-center shadow-sm hover:shadow-md transition-all transform active:scale-95 hover:scale-105"
+            >
+              <ShoppingBag className="w-3.5 h-3.5 text-gold-light" />
+            </button>
+          </div>
         </div>
 
       </div>

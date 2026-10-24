@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useShop } from "@/context/ShopContext";
-import { X, Heart, ShoppingBag, Star, Check, Sparkles, ShieldCheck } from "lucide-react";
+import { X, Heart, ShoppingBag, Star, Check, Sparkles, ShieldCheck, MessageCircle } from "lucide-react";
 
 export const QuickViewModal: React.FC = () => {
   const {
@@ -13,6 +13,7 @@ export const QuickViewModal: React.FC = () => {
     isInWishlist,
     setIsBookingModalOpen,
     setBookingPreselectService,
+    openWhatsAppCheckout,
   } = useShop();
 
   const [selectedSize, setSelectedSize] = useState("Standard / Free Size");
@@ -135,7 +136,22 @@ export const QuickViewModal: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
+              <button
+                onClick={() => {
+                  openWhatsAppCheckout({
+                    product: quickViewProduct,
+                    quantity: quantity,
+                    selectedSize: selectedSize,
+                  });
+                  setQuickViewProduct(null);
+                }}
+                className="flex-1 py-3 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>Order via WhatsApp</span>
+              </button>
+
               <button
                 onClick={() => {
                   addToCart(quickViewProduct, quantity, selectedSize);
@@ -150,7 +166,7 @@ export const QuickViewModal: React.FC = () => {
               <button
                 onClick={() => toggleWishlist(quickViewProduct.id)}
                 aria-label="Wishlist"
-                className={`p-3 rounded-full border transition-colors ${
+                className={`p-3 rounded-full border transition-colors flex items-center justify-center ${
                   wishlisted
                     ? "border-burgundy bg-burgundy text-white"
                     : "border-blush hover:border-burgundy text-burgundy"

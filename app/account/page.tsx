@@ -22,8 +22,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
-
 export default function CustomerAccountPage() {
   const { user, logout, updateProfile, setIsAuthModalOpen, loginAsDemoCustomer } = useAuth();
   const { orders, tailoringInquiries, wishlist, products, addToCart, showToast } = useShop();
@@ -420,7 +418,7 @@ export default function CustomerAccountPage() {
                   </div>
 
                   <a
-                    href={`https://wa.me/919585477733?text=Hello%20Nithu%20Fashion%20World,%20inquiring%20about%20my%20tailoring%20request%20${inq.id}`}
+                    href={`https://wa.me/917373848555?text=Hello%20Nithu%20Fashion%20World,%20inquiring%20about%20my%20tailoring%20request%20${inq.id}`}
                     target="_blank"
                     rel="noreferrer"
                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors"

@@ -72,8 +72,8 @@ export const CategorySection: React.FC = () => {
               </a>
             </div>
 
-            {/* 8 Category Cards Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3.5 sm:gap-4">
+            {/* 8 Category Cards Responsive Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-3 sm:gap-4">
               {CATEGORIES.map((cat) => (
                 <div
                   key={cat.id}

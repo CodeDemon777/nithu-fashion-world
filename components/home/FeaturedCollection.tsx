@@ -50,13 +50,13 @@ export const FeaturedCollection: React.FC = () => {
           </div>
 
           {/* Filter Pills + Arrows */}
-          <div className="flex items-center flex-wrap gap-2 sm:gap-3">
-            <div className="flex items-center flex-wrap gap-1.5 bg-[#F3D7CE]/40 p-1 rounded-full border border-blush/60">
+          <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto overflow-hidden">
+            <div className="flex items-center gap-1.5 overflow-x-auto py-1 px-1.5 bg-[#F3D7CE]/40 rounded-full border border-blush/60 max-w-full">
               {filterTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveCategoryFilter(tab.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                     activeCategoryFilter === tab.id
                       ? "bg-burgundy text-cream shadow-sm"
                       : "text-charcoal hover:text-burgundy hover:bg-white/50"
@@ -68,7 +68,7 @@ export const FeaturedCollection: React.FC = () => {
             </div>
 
             {/* Left / Right Nav Arrows */}
-            <div className="hidden sm:flex items-center gap-1 ml-2">
+            <div className="hidden sm:flex items-center gap-1 ml-2 flex-shrink-0">
               <button
                 aria-label="Previous products"
                 className="w-8 h-8 rounded-full border border-blush hover:border-burgundy flex items-center justify-center text-charcoal hover:text-burgundy transition-colors"
@@ -96,9 +96,9 @@ export const FeaturedCollection: React.FC = () => {
 
         </div>
 
-        {/* Product Grid */}
+        {/* Product Grid Responsive across mobile (2 col), tablet (3 col), laptop (4 col), PC (5 col) */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

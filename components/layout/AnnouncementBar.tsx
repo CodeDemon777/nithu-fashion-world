@@ -46,7 +46,7 @@ export const AnnouncementBar: React.FC = () => {
               <Facebook className="w-3.5 h-3.5" />
             </a>
             <a
-              href="https://wa.me/919585477733"
+              href="https://wa.me/917373848555"
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp"
@@ -55,11 +55,11 @@ export const AnnouncementBar: React.FC = () => {
               <MessageCircle className="w-3.5 h-3.5" />
             </a>
             <a
-              href="tel:9585477733"
+              href="tel:7373848555"
               className="flex items-center gap-1 text-gold-light font-semibold hover:text-white transition-colors ml-2"
             >
               <Phone className="w-3 h-3 text-gold" />
-              <span>9585477733</span>
+              <span>7373848555</span>
             </a>
           </div>
         </div>

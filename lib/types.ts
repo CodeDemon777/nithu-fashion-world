@@ -56,9 +56,12 @@ export interface User {
   phone?: string;
   address?: string;
   city?: string;
+  pincode?: string;
   role: "customer" | "admin";
   avatar?: string;
   joinedDate: string;
+  totalOrders?: number;
+  totalSpent?: number;
 }
 
 export interface OrderItem {
