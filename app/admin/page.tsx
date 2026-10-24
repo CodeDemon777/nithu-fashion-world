@@ -31,11 +31,24 @@ import {
   Copy,
   MapPin,
   Mail,
+  Lock,
+  AlertCircle,
+  LogOut,
+  Key,
+  UserCheck,
 } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminPortalPage() {
-  const { user, loginAsDemoAdmin, customersList, isLoadingCustomers, refreshCustomers } = useAuth();
+  const {
+    user,
+    login,
+    logout,
+    loginAsDemoAdmin,
+    customersList,
+    isLoadingCustomers,
+    refreshCustomers,
+  } = useAuth();
   const {
     products,
     addProduct,
@@ -82,6 +95,12 @@ export default function AdminPortalPage() {
   const [newProdDiscount, setNewProdDiscount] = useState<number>(20);
   const [newProdDesc, setNewProdDesc] = useState("");
   const [newProdImage, setNewProdImage] = useState("/images/categories/sarees.jpg");
+
+  // Admin Sign-In Form State
+  const [adminEmail, setAdminEmail] = useState("admin@nithufashion.com");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminLoginError, setAdminLoginError] = useState("");
+  const [isAdminLoggingIn, setIsAdminLoggingIn] = useState(false);
 
   // Edit Product Modal State
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -222,41 +241,231 @@ export default function AdminPortalPage() {
     showToast("Product updated successfully! ✨");
   };
 
-  // If user is not admin, provide admin login barrier with demo shortcut
-  if (!user || user.role !== "admin") {
+  const handleAdminManualLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminEmail || !adminPassword) {
+      setAdminLoginError("Please enter your admin email and password.");
+      return;
+    }
+    setAdminLoginError("");
+    setIsAdminLoggingIn(true);
+    try {
+      const success = await login(adminEmail, adminPassword);
+      if (success) {
+        showToast("Authenticated as Store Admin 👑");
+      } else {
+        setAdminLoginError("Invalid credentials. Please verify your password.");
+      }
+    } catch (err: any) {
+      setAdminLoginError(err.message || "Admin login failed.");
+    } finally {
+      setIsAdminLoggingIn(false);
+    }
+  };
+
+  // Case 1: Authenticated BUT role is Customer (Broken Access Control Defense)
+  if (user && user.role !== "admin") {
     return (
       <div className="min-h-[75vh] flex items-center justify-center py-16 px-4 bg-[#FFF7F0]">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-blush shadow-card text-center space-y-5 animate-fadeIn">
-          <div className="w-16 h-16 rounded-full bg-burgundy/10 flex items-center justify-center mx-auto text-burgundy">
-            <ShieldCheck className="w-8 h-8 text-gold-dark" />
+        <div className="max-w-lg w-full bg-white rounded-3xl p-8 sm:p-10 border-2 border-amber-300 shadow-luxury text-center space-y-6 animate-fadeIn">
+          <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto text-amber-700">
+            <AlertCircle className="w-8 h-8 text-amber-700" />
           </div>
-          <div>
+
+          <div className="space-y-2">
+            <span className="text-[10px] uppercase tracking-wider font-bold bg-amber-100 text-amber-800 px-3 py-1 rounded-full border border-amber-300">
+              Access Denied • 403 Forbidden
+            </span>
             <h1
-              className="text-2xl sm:text-3xl font-serif text-charcoal font-bold"
+              className="text-2xl sm:text-3xl font-serif text-charcoal font-bold mt-2"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
-              Admin Portal
+              Administrator Privileges Required
             </h1>
-            <p className="text-xs text-charcoal-muted mt-1 leading-relaxed">
-              Store management console is restricted to verified NITHU FASHION WORLD administrators.
+            <p className="text-xs text-charcoal-muted leading-relaxed max-w-md mx-auto">
+              You are currently signed in with a standard <strong>Customer Account</strong>. Administrative access to product catalogs, customer directories, and database controls is restricted.
             </p>
           </div>
+
+          {/* Current Session Info */}
+          <div className="bg-cream-soft rounded-2xl p-4 border border-blush text-left text-xs space-y-1.5">
+            <div className="text-[10px] uppercase font-bold text-charcoal-muted tracking-wider">
+              Current Session
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-charcoal">{user.name}</span>
+              <span className="text-[10px] bg-blush text-burgundy font-semibold px-2 py-0.5 rounded-full uppercase">
+                Role: {user.role}
+              </span>
+            </div>
+            <div className="text-charcoal-muted text-[11px]">{user.email}</div>
+          </div>
+
+          {/* Action Buttons */}
           <div className="space-y-3 pt-2">
             <button
               onClick={() => {
                 loginAsDemoAdmin();
-                showToast("Authenticated as Store Admin 👑");
+                showToast("Switched to Administrator Account 👑");
               }}
-              className="w-full py-3.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold uppercase tracking-wider rounded-full shadow-md transition-all flex items-center justify-center gap-2 transform active:scale-95"
+              className="w-full py-3.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold uppercase tracking-wider rounded-full shadow-md transition-all flex items-center justify-center gap-2"
             >
               <ShieldCheck className="w-4 h-4 text-gold-light" />
-              <span>Login as Admin (1-Click Demo)</span>
+              <span>Switch to Store Admin (Nithu Admin)</span>
             </button>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <Link
+                href="/account"
+                className="py-2.5 bg-cream-soft hover:bg-blush-light text-burgundy border border-blush text-xs font-semibold rounded-full transition-all text-center"
+              >
+                Go to Customer Portal
+              </Link>
+              <Link
+                href="/"
+                className="py-2.5 bg-cream-soft hover:bg-blush-light text-charcoal border border-cream-warm text-xs font-semibold rounded-full transition-all text-center"
+              >
+                Return to Homepage
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Case 2: Unauthenticated — Render Secure Admin Sign-In Gate
+  if (!user) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center py-16 px-4 bg-[#FFF7F0]">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 sm:p-10 border border-blush shadow-luxury space-y-6 animate-fadeIn">
+          <div className="text-center space-y-2">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-burgundy/20 to-gold/20 flex items-center justify-center mx-auto text-burgundy border border-gold/40 shadow-sm">
+              <ShieldCheck className="w-8 h-8 text-gold-dark" />
+            </div>
+            <span className="text-[10px] uppercase tracking-wider font-bold bg-gold/15 text-gold-dark px-3 py-0.5 rounded-full border border-gold/30">
+              NITHU FASHION WORLD
+            </span>
+            <h1
+              className="text-2xl sm:text-3xl font-serif text-charcoal font-bold mt-1"
+              style={{ fontFamily: "var(--font-cormorant)" }}
+            >
+              Admin Portal Sign-In
+            </h1>
+            <p className="text-xs text-charcoal-muted leading-relaxed">
+              Store management console is restricted to authorized administrators.
+            </p>
+          </div>
+
+          {/* Error Message */}
+          {adminLoginError && (
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs text-center font-medium">
+              {adminLoginError}
+            </div>
+          )}
+
+          {/* Admin Credentials Helper Badge */}
+          <div className="bg-[#FFF9F3] rounded-2xl p-3.5 border border-gold/30 text-xs space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-bold text-burgundy">
+              <span className="flex items-center gap-1.5">
+                <Key className="w-3.5 h-3.5 text-gold-dark" />
+                <span>Admin Credentials (Atlas Verified)</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminEmail("admin@nithufashion.com");
+                  setAdminPassword("admin123");
+                  showToast("Filled Admin Credentials ✨");
+                }}
+                className="text-[10px] text-gold-dark underline hover:text-burgundy font-semibold"
+              >
+                Auto Fill
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-[11px] bg-white p-2 rounded-xl border border-blush/60 font-mono">
+              <div>
+                <span className="text-charcoal-muted block text-[9px] font-sans uppercase">Email:</span>
+                <span className="text-charcoal select-all">admin@nithufashion.com</span>
+              </div>
+              <div>
+                <span className="text-charcoal-muted block text-[9px] font-sans uppercase">Password:</span>
+                <span className="text-charcoal select-all">admin123</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleAdminManualLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-charcoal mb-1">
+                Admin Email Address
+              </label>
+              <div className="relative flex items-center">
+                <Mail className="absolute left-3 w-4 h-4 text-burgundy" />
+                <input
+                  type="email"
+                  required
+                  placeholder="admin@nithufashion.com"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full bg-cream-soft text-charcoal text-xs pl-9 pr-3 py-3 rounded-xl border border-blush focus:border-burgundy outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-charcoal mb-1">
+                Admin Password
+              </label>
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 w-4 h-4 text-burgundy" />
+                <input
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  className="w-full bg-cream-soft text-charcoal text-xs pl-9 pr-3 py-3 rounded-xl border border-blush focus:border-burgundy outline-none"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isAdminLoggingIn}
+              className="w-full py-3.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold uppercase tracking-wider rounded-full shadow-md hover:shadow-luxury transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {isAdminLoggingIn ? (
+                <span>Authenticating with MongoDB Atlas...</span>
+              ) : (
+                <>
+                  <ShieldCheck className="w-4 h-4 text-gold-light" />
+                  <span>Sign In to Admin Portal</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* 1-Click Quick Demo Login Box */}
+          <div className="pt-4 border-t border-blush text-center space-y-2.5">
+            <button
+              type="button"
+              onClick={() => {
+                loginAsDemoAdmin();
+                showToast("Authenticated as Store Admin 👑");
+              }}
+              className="w-full py-2.5 bg-gold/15 hover:bg-gold/25 text-burgundy-deep border border-gold/40 text-xs font-semibold rounded-full transition-all flex items-center justify-center gap-2"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
+              <span>1-Click Demo Admin Login</span>
+            </button>
+
             <Link
               href="/"
-              className="block w-full py-2.5 bg-cream-soft hover:bg-blush-light text-burgundy border border-blush text-xs font-semibold rounded-full transition-all text-center"
+              className="block text-center text-xs text-charcoal-muted hover:text-burgundy pt-1"
             >
-              Return to Homepage
+              ← Return to Homepage
             </Link>
           </div>
         </div>
@@ -351,6 +560,32 @@ export default function AdminPortalPage() {
             >
               Customer Portal
             </Link>
+
+            {/* Logged in Admin Identity & Sign Out */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold/15 border border-gold/40 text-cream text-xs">
+              <img
+                src={
+                  user.avatar ||
+                  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+                }
+                alt={user.name}
+                className="w-5 h-5 rounded-full object-cover border border-gold"
+              />
+              <span className="font-semibold text-cream hidden lg:inline max-w-[100px] truncate">
+                {user.name}
+              </span>
+              <button
+                onClick={() => {
+                  logout();
+                  showToast("Signed out of Admin Console 👋");
+                }}
+                className="ml-1 px-2 py-0.5 rounded bg-burgundy hover:bg-burgundy-deep text-gold-light text-[10px] font-bold uppercase transition-colors flex items-center gap-1"
+                title="Sign Out of Admin Console"
+              >
+                <LogOut className="w-3 h-3" />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
 
