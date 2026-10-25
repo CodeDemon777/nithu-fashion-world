@@ -29,12 +29,12 @@ export const Footer: React.FC = () => {
     }
     setIsSubscribed(true);
     triggerConfetti();
-    showToast("Thank you for subscribing to NITHU FASHION WORLD! ✨");
+    showToast("Thank you for subscribing to NITHU FASHION WORLD.");
     setEmail("");
   };
 
   return (
-    <footer id="footer" className="bg-[#3D0008] text-cream-ivory pt-16 pb-8 border-t-2 border-gold/40 relative overflow-hidden">
+    <footer id="footer" className="bg-[#3D0008] text-cream-ivory pt-16 pb-8 relative overflow-hidden">
       
       {/* Subtle Background Glow */}
       <div className="absolute top-0 right-1/3 w-96 h-96 bg-[#720013]/20 rounded-full blur-3xl pointer-events-none" />
@@ -42,16 +42,16 @@ export const Footer: React.FC = () => {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
         
         {/* Main 5 Columns Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-6 lg:gap-6 xl:gap-8 pb-12 border-b border-burgundy-rich/80">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-6 lg:gap-6 xl:gap-8 pb-12">
           
           {/* Col 1: Brand & Bio (3 cols on lg) */}
           <div className="lg:col-span-3 space-y-3">
             <BrandLogo variant="light" size="sm" />
-            <p className="text-xs text-blush-soft/80 leading-relaxed font-sans max-w-xs pt-1">
-              Empowering your elegance with handcrafted luxury sarees, custom bridal blouse tailoring, exquisite Aari craftsmanship, and personalized handcrafted gifts in Tamil Nadu.
+            <p className="text-sm text-blush-soft/90 leading-relaxed font-sans max-w-xs pt-1">
+              Handcrafting luxury Kanchipuram silks, bespoke bridal blouse tailoring, intricate zardozi aari embroidery, and personalized heirloom gifts in Komarapalayam.
             </p>
-            <div className="pt-2 text-xs text-gold-light/90 font-medium">
-              ✨ Traditional Craftsmanship For A Brighter You
+            <div className="pt-2 text-sm text-gold-light font-medium tracking-wide">
+              Traditional Craftsmanship For A Brighter You
             </div>
           </div>
 
@@ -63,7 +63,7 @@ export const Footer: React.FC = () => {
             >
               Quick Links
             </h4>
-            <ul className="space-y-2 text-xs text-cream-ivory/80">
+            <ul className="space-y-2 text-sm text-cream-ivory/80">
               <li>
                 <a href="#home" className="hover:text-gold transition-colors">
                   Home
@@ -81,7 +81,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a href="#categories" className="hover:text-gold transition-colors">
-                  Art & Crafts
+                  Art &amp; Crafts
                 </a>
               </li>
               <li>
@@ -105,7 +105,7 @@ export const Footer: React.FC = () => {
             >
               Customer Care
             </h4>
-            <ul className="space-y-2 text-xs text-cream-ivory/80">
+            <ul className="space-y-2 text-sm text-cream-ivory/80">
               <li>
                 <a href="#home" className="hover:text-gold transition-colors">
                   My Account
@@ -128,7 +128,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a href="#home" className="hover:text-gold transition-colors">
-                  Terms & Conditions
+                  Terms &amp; Conditions
                 </a>
               </li>
             </ul>
@@ -142,7 +142,7 @@ export const Footer: React.FC = () => {
             >
               Contact Us
             </h4>
-            <ul className="space-y-2.5 text-xs text-cream-ivory/90">
+            <ul className="space-y-2.5 text-sm text-cream-ivory/90">
               <li className="flex items-start gap-2">
                 <Phone className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
                 <a href="tel:7373848555" className="hover:text-gold transition-colors">
@@ -168,7 +168,7 @@ export const Footer: React.FC = () => {
                 <Mail className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
                 <a
                   href="mailto:nithufashionworld142624@gmail.com"
-                  className="hover:text-gold transition-colors break-all text-[11px]"
+                  className="hover:text-gold transition-colors break-all text-sm"
                 >
                   nithufashionworld142624@gmail.com
                 </a>
@@ -184,7 +184,7 @@ export const Footer: React.FC = () => {
             >
               Join Our Newsletter
             </h4>
-            <p className="text-[11px] text-blush-soft/80">
+            <p className="text-sm text-blush-soft/80">
               Get latest updates and offers.
             </p>
 
@@ -195,7 +195,7 @@ export const Footer: React.FC = () => {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white text-charcoal text-xs pl-3.5 pr-10 py-2.5 rounded-full border border-gold/40 focus:border-gold outline-none placeholder:text-charcoal-light shadow-sm"
+                className="w-full bg-[#FAF7F2] text-charcoal text-sm pl-3.5 pr-10 py-2.5 rounded-full outline-none placeholder:text-charcoal-muted focus:bg-white transition-colors"
               />
               <button
                 type="submit"
@@ -217,7 +217,7 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
-                className="w-8 h-8 rounded-full bg-burgundy-deep border border-gold/30 hover:border-gold text-gold-light hover:text-white flex items-center justify-center transition-colors shadow-sm"
+                className="w-8 h-8 rounded-full bg-burgundy-deep hover:bg-gold hover:text-burgundy-deep text-gold-light flex items-center justify-center transition-colors"
               >
                 <Instagram className="w-4 h-4" />
               </a>
@@ -226,7 +226,7 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
-                className="w-8 h-8 rounded-full bg-burgundy-deep border border-gold/30 hover:border-gold text-gold-light hover:text-white flex items-center justify-center transition-colors shadow-sm"
+                className="w-8 h-8 rounded-full bg-burgundy-deep hover:bg-gold hover:text-burgundy-deep text-gold-light flex items-center justify-center transition-colors"
               >
                 <Facebook className="w-4 h-4" />
               </a>
@@ -235,7 +235,7 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="WhatsApp"
-                className="w-8 h-8 rounded-full bg-burgundy-deep border border-gold/30 hover:border-gold text-gold-light hover:text-white flex items-center justify-center transition-colors shadow-sm"
+                className="w-8 h-8 rounded-full bg-burgundy-deep hover:bg-gold hover:text-burgundy-deep text-gold-light flex items-center justify-center transition-colors"
               >
                 <MessageCircle className="w-4 h-4" />
               </a>
@@ -244,7 +244,7 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="YouTube"
-                className="w-8 h-8 rounded-full bg-burgundy-deep border border-gold/30 hover:border-gold text-gold-light hover:text-white flex items-center justify-center transition-colors shadow-sm"
+                className="w-8 h-8 rounded-full bg-burgundy-deep hover:bg-gold hover:text-burgundy-deep text-gold-light flex items-center justify-center transition-colors"
               >
                 <Youtube className="w-4 h-4" />
               </a>
@@ -254,15 +254,22 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Copyright & Credits */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-blush-soft/70">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-blush-soft/80">
           <div>
             © 2024-2026 <span className="text-gold-light font-medium">NITHU FASHION WORLD</span>. All rights reserved.
           </div>
-          <div className="flex items-center gap-1.5">
-            <span>Designed with</span>
-            <Heart className="w-3.5 h-3.5 fill-[#E5C78C] text-[#E5C78C]" />
-            <span>for beautiful people</span>
-          </div>
+          <p className="credits text-sm text-blush-soft/80">
+            Footage:{" "}
+            <a
+              href="https://commons.wikimedia.org/wiki/File:Silk_weaving_in_Thailand.webm"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-gold-light"
+            >
+              Silk weaving in Thailand
+            </a>{" "}
+            by Olena Zakharian, CC BY-SA 4.0, via Wikimedia Commons.
+          </p>
         </div>
 
       </div>

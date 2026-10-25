@@ -14,7 +14,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const wishlisted = isInWishlist(product.id);
 
   return (
-    <div className="group relative bg-white rounded-2xl p-3 sm:p-3.5 border border-[#F3D7CE]/70 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between">
+    <div className="group relative bg-white rounded-2xl p-3 sm:p-3.5 transition-colors duration-300 flex flex-col justify-between reveal-card">
       
       {/* Image Area with Badges & Hover Actions */}
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-cream-soft mb-3">
@@ -26,7 +26,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Discount Badge on Top Left */}
         {product.discount && (
-          <div className="absolute top-2.5 left-2.5 bg-burgundy/90 backdrop-blur-sm text-cream text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+          <div className="absolute top-2.5 left-2.5 bg-burgundy text-cream text-sm font-semibold px-2.5 py-0.5 rounded-full">
             {product.discount}% OFF
           </div>
         )}
@@ -38,10 +38,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             toggleWishlist(product.id);
           }}
           aria-label="Add to wishlist"
-          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-sm ${
+          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
             wishlisted
-              ? "bg-burgundy text-white scale-110"
-              : "bg-white/80 hover:bg-white text-burgundy"
+              ? "bg-burgundy text-white"
+              : "bg-white/95 hover:bg-white text-burgundy"
           }`}
         >
           <Heart
@@ -53,7 +53,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="absolute inset-0 bg-burgundy/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
           <button
             onClick={() => setQuickViewProduct(product)}
-            className="bg-white/95 hover:bg-white text-burgundy font-semibold text-xs py-2 px-4 rounded-full shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform"
+            className="bg-white hover:bg-cream-soft text-burgundy font-semibold text-sm py-2 px-4 rounded-full flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform"
           >
             <Eye className="w-3.5 h-3.5" />
             <span>Quick View</span>
@@ -65,15 +65,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="flex flex-col flex-1 justify-between">
         <div>
           {/* Category Tag */}
-          <div className="text-[10px] uppercase tracking-wider text-charcoal-muted font-medium mb-1">
+          <div className="text-sm text-charcoal-muted font-medium mb-1">
             {product.categoryLabel}
           </div>
 
           {/* Title */}
           <h3
             onClick={() => setQuickViewProduct(product)}
-            className="text-xs sm:text-sm font-serif font-semibold text-charcoal group-hover:text-burgundy transition-colors cursor-pointer line-clamp-1"
-            style={{ fontFamily: "var(--font-cormorant)", fontSize: "16px" }}
+            className="text-base sm:text-lg font-serif font-semibold text-charcoal group-hover:text-burgundy transition-colors cursor-pointer line-clamp-1"
+            style={{ fontFamily: "var(--font-cormorant)" }}
           >
             {product.name}
           </h3>
@@ -84,7 +84,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-3 h-3 ${
+                  className={`w-3.5 h-3.5 ${
                     i < Math.floor(product.rating)
                       ? "fill-gold text-gold"
                       : "text-blush-dark fill-blush"
@@ -92,20 +92,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 />
               ))}
             </div>
-            <span className="text-[10px] text-charcoal-muted">
+            <span className="text-sm text-charcoal-muted">
               ({product.reviewsCount})
             </span>
           </div>
         </div>
 
         {/* Price & Add to Cart Footer */}
-        <div className="flex items-center justify-between pt-3 mt-2 border-t border-cream-warm">
+        <div className="flex items-center justify-between pt-3 mt-2">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-sm sm:text-base font-bold text-burgundy font-serif">
+            <span className="text-base sm:text-lg font-bold text-burgundy font-serif">
               ₹{product.price.toLocaleString("en-IN")}
             </span>
             {product.oldPrice && (
-              <span className="text-[11px] sm:text-xs text-charcoal-muted line-through">
+              <span className="text-sm text-charcoal-muted line-through">
                 ₹{product.oldPrice.toLocaleString("en-IN")}
               </span>
             )}
@@ -125,7 +125,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               }}
               title="Order on WhatsApp"
               aria-label={`Order ${product.name} on WhatsApp`}
-              className="w-8 h-8 rounded-full bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center shadow-sm hover:shadow-md transition-all transform active:scale-95 hover:scale-105"
+              className="w-8 h-8 rounded-full bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center transition-colors transform active:scale-95 hover:scale-105"
             >
               <MessageCircle className="w-4 h-4 fill-current" />
             </button>
@@ -135,7 +135,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               onClick={() => addToCart(product)}
               title="Add to Cart"
               aria-label={`Add ${product.name} to cart`}
-              className="w-8 h-8 rounded-full bg-burgundy hover:bg-burgundy-deep text-cream flex items-center justify-center shadow-sm hover:shadow-md transition-all transform active:scale-95 hover:scale-105"
+              className="w-8 h-8 rounded-full bg-burgundy hover:bg-burgundy-deep text-cream flex items-center justify-center transition-colors transform active:scale-95 hover:scale-105"
             >
               <ShoppingBag className="w-3.5 h-3.5 text-gold-light" />
             </button>

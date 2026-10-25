@@ -1,4 +1,4 @@
-# NITHU FASHION WORLD 👑✨
+# NITHU FASHION WORLD
 
 > **Traditional Craftsmanship For A Brighter You**  
 > *Stitching Dreams, Creating You*

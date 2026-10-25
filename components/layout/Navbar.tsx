@@ -69,8 +69,8 @@ export const Navbar: React.FC = () => {
     <header
       className={`sticky top-0 z-30 transition-all duration-300 ${
         isScrolled
-          ? "bg-[#FFFBF7]/95 backdrop-blur-md shadow-luxury py-2.5"
-          : "bg-[#FFF7F0] py-4 border-b border-[#F3D7CE]/50"
+          ? "bg-[#F8F7F5]/95 backdrop-blur-sm py-2.5"
+          : "bg-[#F8F7F5] py-4"
       }`}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
@@ -109,11 +109,11 @@ export const Navbar: React.FC = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
                   onBlur={() => setTimeout(() => setIsSearchFocused(false), 250)}
-                  className="w-full bg-white text-xs pl-3.5 pr-9 py-2 rounded-full border border-blush/80 focus:border-burgundy focus:ring-1 focus:ring-burgundy outline-none transition-all placeholder:text-charcoal-light text-charcoal shadow-sm"
+                  className="w-full bg-[#F8F7F5] text-sm pl-4 pr-10 py-2 rounded-full focus:bg-white focus:outline-none transition-colors placeholder:text-charcoal-light text-charcoal"
                 />
                 <button
                   aria-label="Submit Search"
-                  className="absolute right-2.5 text-burgundy hover:text-gold transition-colors"
+                  className="absolute right-3 text-burgundy hover:text-gold transition-colors"
                 >
                   <Search className="w-4 h-4" />
                 </button>
@@ -122,7 +122,7 @@ export const Navbar: React.FC = () => {
               {/* Search Suggestions Dropdown */}
               {isSearchFocused && searchResults.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-luxury-lg border border-blush p-2 z-50 max-h-80 overflow-y-auto">
-                  <div className="text-[10px] uppercase font-semibold text-charcoal-muted px-2 py-1 tracking-wider">
+                  <div className="text-xs uppercase font-semibold text-charcoal-muted px-2 py-1 tracking-wider">
                     Matching Products ({searchResults.length})
                   </div>
                   {searchResults.map((product) => (
@@ -137,13 +137,13 @@ export const Navbar: React.FC = () => {
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-10 h-10 rounded-md object-cover border border-blush"
+                        className="w-10 h-10 rounded-md object-cover"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs font-medium text-charcoal truncate">
+                        <div className="text-sm font-medium text-charcoal truncate">
                           {product.name}
                         </div>
-                        <div className="text-[11px] text-burgundy font-semibold">
+                        <div className="text-sm text-burgundy font-semibold">
                           ₹{product.price}
                         </div>
                       </div>
@@ -170,7 +170,7 @@ export const Navbar: React.FC = () => {
             >
               <Heart className="w-5 h-5 text-burgundy" />
               {wishlistCount > 0 && (
-                <span className="absolute top-0 right-0 w-4 h-4 bg-burgundy text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                <span className="absolute top-0 right-0 w-4 h-4 bg-burgundy text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                   {wishlistCount}
                 </span>
               )}
@@ -212,7 +212,7 @@ export const Navbar: React.FC = () => {
                           {user.email}
                         </div>
                         <span className="inline-block mt-1 text-[9px] uppercase font-bold tracking-wider text-gold-dark bg-gold/15 px-2 py-0.5 rounded-full">
-                          {user.role === "admin" ? "Administrator 👑" : "Customer ✨"}
+                          {user.role === "admin" ? "Store Administrator" : "Customer Account"}
                         </span>
                       </div>
 
@@ -291,29 +291,29 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Mobile Search Bar */}
-        <div className="md:hidden mt-3 pt-2 border-t border-blush/40">
+        <div className="md:hidden mt-3">
           <div className="relative flex items-center">
             <input
               type="text"
               placeholder="Search sarees, blouses, crafts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white text-xs pl-3.5 pr-9 py-2 rounded-full border border-blush outline-none text-charcoal shadow-sm"
+              className="w-full bg-[#F8F7F5] text-sm pl-4 pr-10 py-2.5 rounded-full outline-none text-charcoal focus:bg-white transition-colors"
             />
-            <Search className="absolute right-3 w-4 h-4 text-burgundy" />
+            <Search className="absolute right-3.5 w-4 h-4 text-burgundy" />
           </div>
         </div>
 
         {/* Mobile Drawer Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-full bg-white/95 backdrop-blur-lg border-b border-blush shadow-luxury-lg px-6 py-6 transition-all animate-fadeIn">
-            <div className="flex flex-col gap-4 text-base font-medium text-charcoal">
+          <div className="lg:hidden fixed inset-x-0 top-full bg-white/95 backdrop-blur-lg px-6 py-6 transition-all animate-fadeIn">
+            <div className="flex flex-col gap-3 text-base font-medium text-charcoal">
               {navLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2 border-b border-cream-warm hover:text-burgundy"
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-[#F8F7F5] hover:text-burgundy transition-colors"
                 >
                   <span>{link.name}</span>
                   <ArrowRight className="w-4 h-4 text-gold" />

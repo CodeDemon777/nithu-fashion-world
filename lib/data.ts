@@ -230,11 +230,11 @@ export const TESTIMONIALS: Testimonial[] = [
 ];
 
 export const INSTAGRAM_POSTS = [
-  { id: "ig-1", image: "/images/instagram/insta-1.jpg", caption: "Kanchipuram Silk Bridal Elegance ✨", likes: 248 },
-  { id: "ig-2", image: "/images/instagram/insta-2.jpg", caption: "Heavy Zardozi & Aari Blouse Work 🪡", likes: 312 },
-  { id: "ig-3", image: "/images/instagram/insta-3.jpg", caption: "Artisan Terracotta Peacock Wall Art 🦚", likes: 189 },
-  { id: "ig-4", image: "/images/instagram/insta-4.jpg", caption: "Personalized Floral Gift Keepsake Box 🎁", likes: 220 },
-  { id: "ig-5", image: "/images/instagram/insta-5.jpg", caption: "Festive Brass Diya Urli Decor 🪔", likes: 405 },
-  { id: "ig-6", image: "/images/instagram/insta-6.jpg", caption: "Artisanal Tailoring Tools & Pure Threads ✂️", likes: 176 },
-  { id: "ig-7", image: "/images/instagram/insta-7.jpg", caption: "Blush Pink Tulle Kids Dream Dress 🎀", likes: 350 },
+  { id: "ig-1", image: "/images/instagram/insta-1.jpg", caption: "Kanchipuram Silk Bridal Elegance", likes: 248 },
+  { id: "ig-2", image: "/images/instagram/insta-2.jpg", caption: "Heavy Zardozi & Aari Blouse Work", likes: 312 },
+  { id: "ig-3", image: "/images/instagram/insta-3.jpg", caption: "Artisan Terracotta Peacock Wall Art", likes: 189 },
+  { id: "ig-4", image: "/images/instagram/insta-4.jpg", caption: "Personalized Floral Gift Keepsake Box", likes: 220 },
+  { id: "ig-5", image: "/images/instagram/insta-5.jpg", caption: "Festive Brass Diya Urli Decor", likes: 405 },
+  { id: "ig-6", image: "/images/instagram/insta-6.jpg", caption: "Artisanal Tailoring Tools & Pure Threads", likes: 176 },
+  { id: "ig-7", image: "/images/instagram/insta-7.jpg", caption: "Blush Pink Tulle Kids Dream Dress", likes: 350 },
 ];

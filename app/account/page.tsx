@@ -88,7 +88,7 @@ export default function CustomerAccountPage() {
       city: profileCity,
       address: profileAddress,
     });
-    showToast("Profile and delivery address updated! ✨");
+    showToast("Profile and delivery address updated successfully.");
   };
 
   const wishlistedProducts = products.filter((p) => wishlist.includes(p.id));
@@ -104,7 +104,7 @@ export default function CustomerAccountPage() {
     try {
       const success = await login(custEmail, custPassword);
       if (success) {
-        showToast("Welcome to your Customer Portal! ✨");
+        showToast("Welcome to your Customer Portal.");
       } else {
         setCustLoginError("Invalid credentials. Please verify your password.");
       }
@@ -240,7 +240,7 @@ export default function CustomerAccountPage() {
               href="/admin"
               className="px-4 py-2 bg-gold text-burgundy-deep hover:bg-gold-light text-xs font-bold uppercase tracking-wider rounded-full shadow-gold transition-all whitespace-nowrap text-center"
             >
-              Open Admin Console 👑
+              Open Admin Console
             </Link>
           </div>
         )}
@@ -259,7 +259,7 @@ export default function CustomerAccountPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs uppercase tracking-wider font-semibold text-gold-dark bg-gold/10 px-2.5 py-0.5 rounded-full border border-gold/30">
-                  {user.role === "admin" ? "Store Administrator 👑" : "Valued Customer ✨"}
+                  {user.role === "admin" ? "Store Administrator" : "Valued Customer"}
                 </span>
                 <span className="text-[11px] text-charcoal-muted">
                   Member since {user.joinedDate || "2026"}

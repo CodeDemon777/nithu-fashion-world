@@ -44,9 +44,7 @@ const config: Config = {
       },
       fontFamily: {
         serif: ["var(--font-cormorant)", "Georgia", "serif"],
-        playfair: ["var(--font-playfair)", "Georgia", "serif"],
-        script: ["var(--font-allura)", "cursive"],
-        sans: ["var(--font-montserrat)", "system-ui", "sans-serif"],
+        sans: ["var(--font-archivo)", "system-ui", "sans-serif"],
       },
       boxShadow: {
         luxury: "0 10px 30px -10px rgba(87, 0, 13, 0.15)",

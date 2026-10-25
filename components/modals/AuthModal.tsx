@@ -82,7 +82,7 @@ export const AuthModal: React.FC = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        showToast("Welcome back to NITHU FASHION WORLD! ✨");
+        showToast("Welcome back to NITHU FASHION WORLD.");
       } else {
         setError("Invalid email or password. Please try again.");
       }
@@ -171,7 +171,7 @@ export const AuthModal: React.FC = () => {
   const fillOtp = (code: string) => {
     const digits = code.split("").slice(0, 6);
     setOtpDigits(digits);
-    showToast("Filled verification code! ✨");
+    showToast("Filled verification code.");
   };
 
   // Step 2: Verify OTP & Complete Registration

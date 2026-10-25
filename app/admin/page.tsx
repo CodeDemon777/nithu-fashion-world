@@ -188,7 +188,7 @@ export default function AdminPortalPage() {
     setIsRefreshing(true);
     await Promise.all([refreshProducts(), refreshCustomers()]);
     setIsRefreshing(false);
-    showToast("Data synced from database! 🔄");
+    showToast("Data synced from database.");
   };
 
   const handleSeed = async () => {
@@ -239,7 +239,7 @@ export default function AdminPortalPage() {
     // Reset
     setNewProdName("");
     setNewProdDesc("");
-    showToast(`Product "${newProd.name}" added to live store! 🛍️`);
+    showToast(`Product "${newProd.name}" added to catalog.`);
   };
 
   const handleUpdateProductSubmit = (e: React.FormEvent) => {

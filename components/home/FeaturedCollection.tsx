@@ -24,42 +24,33 @@ export const FeaturedCollection: React.FC = () => {
       : PRODUCTS.filter((p) => p.category === activeCategoryFilter);
 
   return (
-    <section id="featured-collection" className="py-16 sm:py-20 bg-[#FFF7F0]">
+    <section id="featured-collection" className="pt-20 pb-16 sm:py-20 bg-[#F8F7F5] scroll-mt-24">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
         
         {/* Section Header with Filter Pills and Slider Controls */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-4 border-b border-blush/60">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           
           {/* Title */}
           <div>
-            <span className="text-[11px] tracking-[0.25em] uppercase text-charcoal-muted font-semibold">
-              Curated By Artisans
-            </span>
             <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-serif text-charcoal flex items-baseline flex-wrap gap-2 mt-0.5"
+              className="text-3xl sm:text-4xl lg:text-5xl font-serif text-charcoal font-bold tracking-tight"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
-              <span>Featured</span>
-              <span
-                className="font-script text-burgundy text-4xl sm:text-5xl lg:text-6xl font-normal leading-none ml-1"
-                style={{ fontFamily: "var(--font-allura)" }}
-              >
-                Collection
-              </span>
+              Featured Collection
             </h2>
           </div>
 
           {/* Filter Pills + Arrows */}
           <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto overflow-hidden">
-            <div className="flex items-center gap-1.5 overflow-x-auto py-1 px-1.5 bg-[#F3D7CE]/40 rounded-full border border-blush/60 max-w-full">
+            <div className="flex items-center gap-1.5 overflow-x-auto py-1 px-1.5 bg-[#EFEAE4] rounded-full max-w-full">
               {filterTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveCategoryFilter(tab.id)}
-                  className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`px-3.5 sm:px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${
                     activeCategoryFilter === tab.id
-                      ? "bg-burgundy text-cream shadow-sm"
-                      : "text-charcoal hover:text-burgundy hover:bg-white/50"
+                      ? "bg-burgundy text-cream"
+                      : "text-charcoal hover:text-burgundy hover:bg-white/60"
                   }`}
                 >
                   {tab.label}
@@ -71,7 +62,7 @@ export const FeaturedCollection: React.FC = () => {
             <div className="hidden sm:flex items-center gap-1 ml-2 flex-shrink-0">
               <button
                 aria-label="Previous products"
-                className="w-8 h-8 rounded-full border border-blush hover:border-burgundy flex items-center justify-center text-charcoal hover:text-burgundy transition-colors"
+                className="w-8 h-8 rounded-full bg-[#EFEAE4] hover:bg-burgundy hover:text-white flex items-center justify-center text-charcoal transition-colors"
                 onClick={() => {
                   const currentIndex = filterTabs.findIndex((t) => t.id === activeCategoryFilter);
                   const prevIndex = (currentIndex - 1 + filterTabs.length) % filterTabs.length;
@@ -82,7 +73,7 @@ export const FeaturedCollection: React.FC = () => {
               </button>
               <button
                 aria-label="Next products"
-                className="w-8 h-8 rounded-full border border-blush hover:border-burgundy flex items-center justify-center text-charcoal hover:text-burgundy transition-colors"
+                className="w-8 h-8 rounded-full bg-[#EFEAE4] hover:bg-burgundy hover:text-white flex items-center justify-center text-charcoal transition-colors"
                 onClick={() => {
                   const currentIndex = filterTabs.findIndex((t) => t.id === activeCategoryFilter);
                   const nextIndex = (currentIndex + 1) % filterTabs.length;

@@ -112,7 +112,7 @@ export const WhatsAppCheckoutModal: React.FC = () => {
       message += `📝 *Custom Notes / Measurements:* ${notes.trim()}\n`;
     }
     message += `─────────────────────────\n`;
-    message += `✨ Hello Nithu Fashion World, I would like to confirm this order. Please share tailoring/dispatch updates. Thank you!`;
+    message += `Hello Nithu Fashion World, I would like to confirm this order. Please share tailoring/dispatch updates. Thank you!`;
 
     // Save to local orders list in context
     createOrder({

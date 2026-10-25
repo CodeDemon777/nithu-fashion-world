@@ -33,7 +33,7 @@ export const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <section id="how-it-works" className="relative py-16 sm:py-20 bg-hero-burgundy text-cream-ivory overflow-hidden border-y border-[#720013]/60">
+    <section id="how-it-works" className="relative py-16 sm:py-24 bg-hero-burgundy text-cream-ivory overflow-hidden">
       
       {/* Background Floral Accents */}
       <FloralAccent
@@ -49,79 +49,83 @@ export const HowItWorks: React.FC = () => {
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
         
-        <div className="flex flex-col lg:flex-row items-center gap-8">
+        {/* Section Header */}
+        <div className="max-w-2xl mb-12 sm:mb-16 text-left">
+          <h2
+            className="text-3xl sm:text-4xl lg:text-5xl font-serif text-cream font-bold tracking-tight leading-tight"
+            style={{ fontFamily: "var(--font-cormorant)" }}
+          >
+            How We Craft Your Couture
+          </h2>
+          <p className="text-base sm:text-lg text-blush-soft mt-3 font-normal leading-relaxed">
+            From heirloom silk selection and bridal fitting consultations to intricate hand-aari needlework in Komarapalayam.
+          </p>
+        </div>
+
+        {/* Narrative Split: Authentic Loom Video on Left, 4-Step Process on Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* Vertical Ribbon Left (from reference screenshot) */}
-          <div className="hidden xl:flex flex-col items-center justify-center pr-4 select-none opacity-80">
-            <div className="rotate-[-90deg] whitespace-nowrap text-[11px] tracking-[0.3em] uppercase font-medium text-gold-light">
-              Your Style • Our Craft • Always Unique
+          {/* Left: Authentic Silk Weaving Loop Video */}
+          <div className="lg:col-span-5 relative rounded-3xl overflow-hidden aspect-[4/3] bg-[#3D0008]">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster="/videos/silk-weaving-in-thailand-poster.jpg"
+              className="w-full h-full object-cover"
+              aria-hidden="true"
+            >
+              <source src="/videos/silk-weaving-in-thailand.webm" type="video/webm" />
+            </video>
+            
+            <div className="absolute bottom-4 left-4 right-4 bg-[#3D0008]/90 p-3 rounded-xl flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gold-light font-semibold">Master Loom &amp; Needlework</p>
+                <p className="text-sm text-cream/80">Authentic Heritage Handcraft</p>
+              </div>
+              <Sparkles className="w-4 h-4 text-gold" />
             </div>
-            <Heart className="w-3.5 h-3.5 fill-gold-light text-gold-light mt-14" />
           </div>
 
-          {/* Main Steps Content */}
-          <div className="flex-1 w-full text-center">
-            
-            {/* Header */}
-            <div className="mb-12 space-y-1">
-              <h2
-                className="text-3xl sm:text-4xl lg:text-5xl font-serif text-cream font-normal tracking-wide"
-                style={{ fontFamily: "var(--font-cormorant)" }}
-              >
-                How It Works
-              </h2>
-              <p
-                className="text-lg sm:text-xl font-script text-gold-light italic"
-                style={{ fontFamily: "var(--font-allura)" }}
-              >
-                From Your Heart to Your Hands
+          {/* Right: 4-Step Editorial Flow */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="p-5 rounded-2xl bg-[#3D0008] transition-colors reveal-card">
+              <h3 className="text-xl sm:text-2xl font-serif text-cream font-bold" style={{ fontFamily: "var(--font-cormorant)" }}>
+                1. Select Saree &amp; Custom Silhouette
+              </h3>
+              <p className="text-base text-blush-soft mt-1 leading-relaxed">
+                Choose pure Kanchipuram silks or bring your bespoke bridal silhouette and fabric concept to our atelier.
               </p>
-              <div className="w-16 h-0.5 bg-gold/40 mx-auto mt-2" />
             </div>
 
-            {/* 4 Steps Row with Connecting Arrows */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-4 relative">
-              {steps.map((step, idx) => {
-                const IconComponent = step.icon;
-                return (
-                  <div
-                    key={step.number}
-                    className="relative flex flex-col items-center p-4 rounded-2xl bg-burgundy-deep/30 border border-gold/15 hover:border-gold/40 backdrop-blur-sm transition-all duration-300 group"
-                  >
-                    {/* Circular Icon Container */}
-                    <div className="relative mb-4">
-                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-cream-ivory text-burgundy flex items-center justify-center shadow-gold group-hover:scale-110 transition-transform duration-300">
-                        <IconComponent className="w-7 h-7 text-burgundy" />
-                      </div>
-                      
-                      {/* Step Number Badge */}
-                      <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gold text-burgundy-deep text-xs font-bold flex items-center justify-center shadow-sm">
-                        {step.number}
-                      </div>
-                    </div>
-
-                    {/* Step Title & Description */}
-                    <h3
-                      className="text-base sm:text-lg font-serif text-cream font-medium mb-1.5"
-                      style={{ fontFamily: "var(--font-cormorant)" }}
-                    >
-                      {step.number} {step.title}
-                    </h3>
-                    <p className="text-xs text-blush-soft/90 max-w-[200px] leading-relaxed">
-                      {step.subtitle}
-                    </p>
-
-                    {/* Desktop Connecting Arrow between steps */}
-                    {idx < steps.length - 1 && (
-                      <div className="hidden lg:flex absolute top-10 -right-3 z-20 text-gold-light/60">
-                        <ArrowRight className="w-5 h-5" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            <div className="p-5 rounded-2xl bg-[#3D0008] transition-colors reveal-card" style={{ animationDelay: "0.1s" }}>
+              <h3 className="text-xl sm:text-2xl font-serif text-cream font-bold" style={{ fontFamily: "var(--font-cormorant)" }}>
+                2. Bespoke Measurements &amp; Fitting Guidance
+              </h3>
+              <p className="text-base text-blush-soft mt-1 leading-relaxed">
+                Provide precise measurements online or request our expert WhatsApp video measurement consultation.
+              </p>
             </div>
 
+            <div className="p-5 rounded-2xl bg-[#3D0008] transition-colors reveal-card" style={{ animationDelay: "0.2s" }}>
+              <h3 className="text-xl sm:text-2xl font-serif text-cream font-bold" style={{ fontFamily: "var(--font-cormorant)" }}>
+                3. Intricate Aari &amp; Zardozi Embroidery
+              </h3>
+              <p className="text-base text-blush-soft mt-1 leading-relaxed">
+                Master craftswomen bead fine metallic threads, pearls, and custom motifs with authentic generational skills.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#3D0008] transition-colors reveal-card" style={{ animationDelay: "0.3s" }}>
+              <h3 className="text-xl sm:text-2xl font-serif text-cream font-bold" style={{ fontFamily: "var(--font-cormorant)" }}>
+                4. Quality Inspection &amp; Doorstep Delivery
+              </h3>
+              <p className="text-base text-blush-soft mt-1 leading-relaxed">
+                Every stitch is inspected for flawless comfort and finish, packed in luxury protection, and delivered across Tamil Nadu.
+              </p>
+            </div>
           </div>
 
         </div>

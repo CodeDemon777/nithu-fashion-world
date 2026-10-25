@@ -46,7 +46,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       {/* Official Brand Logo Icon with strict constraints */}
       <div
         style={{ width: dim, height: dim, minWidth: dim, minHeight: dim, maxWidth: dim, maxHeight: dim }}
-        className="relative flex-shrink-0 rounded-xl overflow-hidden border border-gold/40 shadow-sm bg-burgundy-deep/90"
+        className="relative flex-shrink-0 rounded-xl overflow-hidden bg-burgundy-deep"
       >
         <img
           src="/images/logo/logo.png"
@@ -54,28 +54,21 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           className="w-full h-full object-cover object-center block"
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
-        <div className="absolute inset-0 rounded-xl ring-1 ring-gold/40 pointer-events-none" />
       </div>
 
       {/* Brand Typography */}
       <div className="flex flex-col leading-tight min-w-0">
         <span
-          className={`text-lg sm:text-xl font-serif tracking-[0.15em] font-bold uppercase truncate ${textColor}`}
+          className={`text-lg sm:text-xl font-serif tracking-[0.12em] font-bold uppercase truncate ${textColor}`}
           style={{ fontFamily: "var(--font-cormorant)" }}
         >
           NITHU
         </span>
         <span
-          className={`text-[9px] uppercase tracking-[0.32em] font-semibold ${subTextColor}`}
-          style={{ fontFamily: "var(--font-montserrat)" }}
+          className={`text-sm tracking-[0.14em] font-medium ${subTextColor}`}
+          style={{ fontFamily: "var(--font-archivo)" }}
         >
-          FASHION WORLD
-        </span>
-        <span
-          className={`text-[11px] font-script tracking-wide italic mt-0.5 ${scriptColor}`}
-          style={{ fontFamily: "var(--font-allura)", fontSize: "14px" }}
-        >
-          Stitching Dreams, Creating You
+          Fashion World
         </span>
       </div>
     </div>

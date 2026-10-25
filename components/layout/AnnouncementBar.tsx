@@ -3,7 +3,7 @@ import { Truck, ShieldCheck, Heart, Instagram, Facebook, Phone, MessageCircle } 
 
 export const AnnouncementBar: React.FC = () => {
   return (
-    <div className="bg-[#4A0009] text-cream-ivory text-[11px] sm:text-xs py-2 px-4 sm:px-8 border-b border-burgundy-deep/60 relative z-40">
+    <div className="bg-[#4A0009] text-cream-ivory text-sm py-2 px-4 sm:px-8 relative z-40">
       <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
         {/* Left Announcements */}
         <div className="flex items-center flex-wrap justify-center sm:justify-start gap-4 sm:gap-6 font-medium tracking-wide">
@@ -24,7 +24,7 @@ export const AnnouncementBar: React.FC = () => {
         </div>
 
         {/* Right Social & Contact */}
-        <div className="flex items-center gap-4 text-cream/90 text-[11px]">
+        <div className="flex items-center gap-4 text-cream/90 text-sm">
           <span className="hidden sm:inline text-gold-light/80 font-medium">Follow Us:</span>
           <div className="flex items-center gap-3">
             <a

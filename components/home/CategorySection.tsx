@@ -22,7 +22,7 @@ export const CategorySection: React.FC = () => {
   };
 
   return (
-    <section id="categories" className="relative py-16 sm:py-20 bg-[#FFF7F0] overflow-hidden">
+    <section id="categories" className="relative py-16 sm:py-20 bg-[#F8F7F5] overflow-hidden">
       {/* Decorative Botanical Flourish on Left */}
       <FloralAccent
         variant="burgundy"
@@ -31,57 +31,38 @@ export const CategorySection: React.FC = () => {
       />
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
-          
-          {/* Left Side Decorative Vertical Ribbon (as in reference screenshot) */}
-          <div className="hidden xl:flex flex-col items-center justify-center pr-4 select-none opacity-80 pt-10">
-            <div className="rotate-[-90deg] whitespace-nowrap text-[12px] tracking-[0.25em] font-serif text-burgundy-wine font-medium">
-              More Than Fashion • A Story of You
-            </div>
-            <Heart className="w-4 h-4 fill-burgundy text-burgundy mt-14" />
-          </div>
-
-          {/* Main Category Content Area */}
-          <div className="flex-1 w-full">
+        <div className="w-full">
             {/* Section Header */}
-            <div className="flex items-end justify-between mb-10 pb-3 border-b border-blush/60">
-              <div className="space-y-1">
-                <span className="text-[11px] tracking-[0.25em] uppercase text-charcoal-muted font-semibold">
-                  Handcrafted Collections
-                </span>
+            <div className="flex items-end justify-between mb-10">
+              <div>
                 <h2
-                  className="text-3xl sm:text-4xl lg:text-5xl font-serif text-charcoal flex items-baseline flex-wrap gap-2"
+                  className="text-3xl sm:text-4xl lg:text-5xl font-serif text-charcoal font-bold tracking-tight"
                   style={{ fontFamily: "var(--font-cormorant)" }}
                 >
-                  <span>Shop by</span>
-                  <span
-                    className="font-script text-burgundy text-4xl sm:text-5xl lg:text-6xl font-normal leading-none ml-1"
-                    style={{ fontFamily: "var(--font-allura)" }}
-                  >
-                    Category
-                  </span>
+                  Shop Handcrafted Categories
                 </h2>
               </div>
 
               <a
                 href="#featured-collection"
-                className="group flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-burgundy hover:text-burgundy-wine transition-colors pb-1"
+                className="group flex items-center gap-1.5 text-sm font-semibold text-burgundy hover:text-burgundy-wine transition-colors pb-1"
               >
-                <span>View All</span>
+                <span>View All Categories</span>
                 <ArrowRight className="w-4 h-4 text-burgundy transition-transform group-hover:translate-x-1" />
               </a>
             </div>
 
             {/* 8 Category Cards Responsive Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-3 sm:gap-4">
-              {CATEGORIES.map((cat) => (
+              {CATEGORIES.map((cat, idx) => (
                 <div
                   key={cat.id}
                   onClick={() => handleCategoryClick(cat.slug)}
-                  className="group cursor-pointer flex flex-col bg-white rounded-2xl p-2 sm:p-2.5 border border-[#F3D7CE]/70 shadow-sm hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-1.5"
+                  style={{ animationDelay: `${idx * 0.05}s` }}
+                  className="group cursor-pointer flex flex-col bg-white rounded-2xl p-2.5 transition-colors duration-300 reveal-card"
                 >
                   {/* Category Image Box */}
-                  <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-cream-soft">
+                  <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#FAF7F2]">
                     <img
                       src={cat.image}
                       alt={cat.name}
@@ -94,12 +75,12 @@ export const CategorySection: React.FC = () => {
                   {/* Category Name Label */}
                   <div className="pt-2.5 pb-1 text-center">
                     <h3
-                      className="text-xs sm:text-[13px] font-medium text-charcoal group-hover:text-burgundy transition-colors leading-tight font-serif"
-                      style={{ fontFamily: "var(--font-cormorant)", fontSize: "14px" }}
+                      className="text-sm font-medium text-charcoal group-hover:text-burgundy transition-colors leading-tight font-serif"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
                     >
                       {cat.name}
                     </h3>
-                    <p className="text-[10px] text-charcoal-muted mt-0.5 opacity-80">
+                    <p className="text-sm text-charcoal-muted mt-0.5">
                       {cat.itemCount}
                     </p>
                   </div>
@@ -107,8 +88,6 @@ export const CategorySection: React.FC = () => {
               ))}
             </div>
           </div>
-
-        </div>
       </div>
     </section>
   );

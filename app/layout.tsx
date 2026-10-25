@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Cormorant_Garamond, Archivo } from "next/font/google";
 import "./globals.css";
 import { ShopProvider } from "@/context/ShopContext";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
@@ -9,9 +10,24 @@ import { WishlistDrawer } from "@/components/modals/WishlistDrawer";
 import { QuickViewModal } from "@/components/modals/QuickViewModal";
 import { BookServiceModal } from "@/components/modals/BookServiceModal";
 import { WhatsAppCheckoutModal } from "@/components/modals/WhatsAppCheckoutModal";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { FloatingWhatsApp } from "@/components/ui/FloatingWhatsApp";
 import { ToastNotification } from "@/components/ui/ToastNotification";
+import { AuthProvider } from "@/context/AuthContext";
+import { AuthModal } from "@/components/modals/AuthModal";
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const archivo = Archivo({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-archivo",
+  display: "swap",
+});
 
 export const viewport = {
   width: "device-width",
@@ -35,17 +51,14 @@ export const metadata: Metadata = {
   authors: [{ name: "NITHU FASHION WORLD" }],
 };
 
-import { AuthProvider } from "@/context/AuthContext";
-import { AuthModal } from "@/components/modals/AuthModal";
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="antialiased min-h-screen flex flex-col bg-[#FFF7F0] text-[#24191A] selection:bg-burgundy selection:text-cream">
+    <html lang="en" className={`${cormorant.variable} ${archivo.variable} scroll-smooth`}>
+      <body className="antialiased min-h-[100dvh] flex flex-col bg-[#F8F7F5] text-[#24191A] selection:bg-burgundy selection:text-cream">
         <AuthProvider>
           <ShopProvider>
             {/* Top Announcement Bar */}
@@ -54,8 +67,8 @@ export default function RootLayout({
             {/* Sticky Navbar */}
             <Navbar />
 
-            {/* Page Content with safe padding for mobile bottom nav */}
-            <main className="flex-1 pb-16 md:pb-0">{children}</main>
+            {/* Page Content */}
+            <main className="flex-1">{children}</main>
 
             {/* Luxury Footer */}
             <Footer />
@@ -69,8 +82,7 @@ export default function RootLayout({
             <AuthModal />
             <ToastNotification />
 
-            {/* Mobile Bottom Navigation Bar & WhatsApp Widget */}
-            <MobileBottomNav />
+            {/* WhatsApp Widget */}
             <FloatingWhatsApp />
           </ShopProvider>
         </AuthProvider>

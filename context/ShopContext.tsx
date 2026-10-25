@@ -261,7 +261,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(data.message || "MongoDB Atlas seeded successfully! ✨");
+        showToast(data.message || "MongoDB Atlas seeded successfully.");
         triggerConfetti();
         await refreshProducts();
         await refreshDbStatus();
