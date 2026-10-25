@@ -28,7 +28,6 @@ import {
   RefreshCw,
   Database,
   Users,
-  Copy,
   MapPin,
   Mail,
   Lock,
@@ -58,8 +57,6 @@ export default function AdminPortalPage() {
     tailoringInquiries,
     updateInquiryStatus,
     showToast,
-    dbStatus,
-    refreshDbStatus,
     seedDatabase,
     refreshProducts,
   } = useShop();
@@ -79,9 +76,7 @@ export default function AdminPortalPage() {
   const [inquirySearch, setInquirySearch] = useState("");
   const [inquiryStatusFilter, setInquiryStatusFilter] = useState<string>("all");
 
-  // Atlas & Seeding State
-  const [isAtlasModalOpen, setIsAtlasModalOpen] = useState(false);
-  const [copiedEnv, setCopiedEnv] = useState(false);
+  // Seeding & Refresh State
   const [isSeeding, setIsSeeding] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -166,9 +161,9 @@ export default function AdminPortalPage() {
 
   const handleRefreshAll = async () => {
     setIsRefreshing(true);
-    await Promise.all([refreshProducts(), refreshCustomers(), refreshDbStatus()]);
+    await Promise.all([refreshProducts(), refreshCustomers()]);
     setIsRefreshing(false);
-    showToast("Data synced from MongoDB Atlas! 🔄");
+    showToast("Data synced from database! 🔄");
   };
 
   const handleSeed = async () => {
@@ -457,29 +452,6 @@ export default function AdminPortalPage() {
           </div>
 
           <div className="flex items-center flex-wrap gap-2.5 w-full md:w-auto">
-            {/* MongoDB Atlas Status Pill */}
-            <button
-              onClick={() => setIsAtlasModalOpen(true)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border transition-all ${
-                dbStatus?.connected
-                  ? "bg-emerald-950/80 border-emerald-500/50 text-emerald-300 hover:bg-emerald-900"
-                  : "bg-amber-950/80 border-amber-500/50 text-amber-300 hover:bg-amber-900"
-              }`}
-              title="Click to check MongoDB Atlas connection & setup guide"
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  dbStatus?.connected ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
-                }`}
-              />
-              <Database className="w-3.5 h-3.5 text-gold-light" />
-              <span>
-                {dbStatus?.connected
-                  ? `Atlas: Connected (${dbStatus.database || "nithu_fashion_world"})`
-                  : "Atlas: Setup Guide"}
-              </span>
-            </button>
-
             {/* Seed Database Button */}
             <button
               onClick={handleSeed}
@@ -1611,202 +1583,7 @@ export default function AdminPortalPage() {
           </div>
         )}
 
-        {/* Modal: MongoDB Atlas Setup & Connection Guide */}
-        {isAtlasModalOpen && (
-          <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fadeIn">
-            <div className="relative bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-blush space-y-6 max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between pb-3 border-b border-cream-warm">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center">
-                    <Database className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3
-                      className="text-xl sm:text-2xl font-serif text-charcoal font-bold"
-                      style={{ fontFamily: "var(--font-cormorant)" }}
-                    >
-                      MongoDB Atlas Cloud Storage
-                    </h3>
-                    <p className="text-xs text-charcoal-muted">
-                      Customer Profiles, Product Catalog & Orders Storage
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsAtlasModalOpen(false)}
-                  className="p-1 rounded-full hover:bg-cream-soft text-charcoal-muted"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
 
-              {/* Status Card */}
-              <div
-                className={`p-4 rounded-2xl border text-xs space-y-2 ${
-                  dbStatus?.connected
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-950"
-                    : "bg-amber-50 border-amber-200 text-amber-950"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold flex items-center gap-2">
-                    <span
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        dbStatus?.connected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
-                      }`}
-                    />
-                    Status: {dbStatus?.connected ? "Connected to MongoDB Atlas 🟢" : "Not Connected / Setup Required ⚠️"}
-                  </span>
-                  <button
-                    onClick={refreshDbStatus}
-                    className="text-[11px] font-semibold underline text-burgundy hover:text-burgundy-deep"
-                  >
-                    Test Connection
-                  </button>
-                </div>
-                <p className="text-charcoal-muted leading-relaxed">
-                  {dbStatus?.message ||
-                    "Set your MONGODB_URI in .env.local to store customer details and product details in the cloud."}
-                </p>
-
-                {dbStatus?.connected && (
-                  <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-                    <div className="bg-white p-2 rounded-xl border border-emerald-200">
-                      <span className="text-[10px] text-charcoal-muted block uppercase">Products in DB</span>
-                      <span className="font-bold text-emerald-800 text-base">{dbStatus.stats?.productsCount || 0}</span>
-                    </div>
-                    <div className="bg-white p-2 rounded-xl border border-emerald-200">
-                      <span className="text-[10px] text-charcoal-muted block uppercase">Customers in DB</span>
-                      <span className="font-bold text-emerald-800 text-base">{dbStatus.stats?.customersCount || 0}</span>
-                    </div>
-                    <div className="bg-white p-2 rounded-xl border border-emerald-200">
-                      <span className="text-[10px] text-charcoal-muted block uppercase">Orders in DB</span>
-                      <span className="font-bold text-emerald-800 text-base">{dbStatus.stats?.ordersCount || 0}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Step-by-Step Instructions */}
-              <div className="space-y-4 text-xs text-charcoal leading-relaxed">
-                <h4 className="font-serif font-bold text-sm text-burgundy uppercase tracking-wider">
-                  Quick MongoDB Atlas Setup (5 Steps)
-                </h4>
-
-                <div className="space-y-3">
-                  <div className="flex gap-3 items-start bg-cream-soft/50 p-3 rounded-xl border border-blush/60">
-                    <span className="w-5 h-5 rounded-full bg-burgundy text-cream text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                      1
-                    </span>
-                    <div>
-                      <strong>Create Free Atlas Account:</strong> Sign up or log in at{" "}
-                      <a
-                        href="https://cloud.mongodb.com"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-burgundy font-bold underline inline-flex items-center gap-1"
-                      >
-                        cloud.mongodb.com <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 items-start bg-cream-soft/50 p-3 rounded-xl border border-blush/60">
-                    <span className="w-5 h-5 rounded-full bg-burgundy text-cream text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                      2
-                    </span>
-                    <div>
-                      <strong>Create Free Shared Cluster:</strong> Click <em>&quot;Create a Deployment&quot;</em> &gt; choose <strong>M0 (Free)</strong> &gt; Select AWS provider and region (e.g. Mumbai <em>ap-south-1</em>) &gt; Click <em>Create Cluster</em>.
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 items-start bg-cream-soft/50 p-3 rounded-xl border border-blush/60">
-                    <span className="w-5 h-5 rounded-full bg-burgundy text-cream text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                      3
-                    </span>
-                    <div>
-                      <strong>Create Database User:</strong> In Atlas left sidebar, go to <strong>Database Access</strong> &gt; click <em>&quot;Add New Database User&quot;</em>. Set a Username (e.g. <code>nithu_admin</code>) and Password &gt; grant <em>Read and Write to any database</em> &gt; Save.
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 items-start bg-cream-soft/50 p-3 rounded-xl border border-blush/60">
-                    <span className="w-5 h-5 rounded-full bg-burgundy text-cream text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                      4
-                    </span>
-                    <div>
-                      <strong>Allow Network Access:</strong> In left sidebar, click <strong>Network Access</strong> &gt; <em>&quot;Add IP Address&quot;</em> &gt; click <strong>&quot;Allow Access from Anywhere&quot;</strong> (<code>0.0.0.0/0</code>) &gt; Confirm.
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 items-start bg-cream-soft/50 p-3 rounded-xl border border-blush/60">
-                    <span className="w-5 h-5 rounded-full bg-burgundy text-cream text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                      5
-                    </span>
-                    <div>
-                      <strong>Copy Connection String:</strong> Go to <strong>Clusters / Database</strong> &gt; Click <strong>&quot;Connect&quot;</strong> &gt; Choose <strong>&quot;Drivers&quot; (Node.js)</strong> &gt; Copy your connection string.
-                    </div>
-                  </div>
-                </div>
-
-                {/* Connection String Template */}
-                <div className="space-y-1.5 pt-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-charcoal">Paste into your <code>.env.local</code> file:</span>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          "MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/nithu_fashion_world?retryWrites=true&w=majority"
-                        );
-                        setCopiedEnv(true);
-                        showToast("Connection string template copied! 📋");
-                        setTimeout(() => setCopiedEnv(false), 2500);
-                      }}
-                      className="text-[11px] text-burgundy font-semibold flex items-center gap-1 hover:underline"
-                    >
-                      {copiedEnv ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedEnv ? "Copied!" : "Copy Template"}</span>
-                    </button>
-                  </div>
-                  <pre className="bg-charcoal text-cream-ivory p-3 rounded-xl text-[11px] overflow-x-auto font-mono">
-                    MONGODB_URI=mongodb+srv://&lt;username&gt;:&lt;password&gt;@cluster0.xxxxx.mongodb.net/nithu_fashion_world?retryWrites=true&amp;w=majority
-                  </pre>
-                  <p className="text-[11px] text-charcoal-muted">
-                    Replace <code>&lt;username&gt;</code> and <code>&lt;password&gt;</code> with your database credentials. Restart <code>npm run dev</code> after editing <code>.env.local</code>.
-                  </p>
-                </div>
-              </div>
-
-              {/* Modal Bottom Actions */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 pt-3 border-t border-cream-warm">
-                <a
-                  href="https://cloud.mongodb.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full sm:w-auto px-5 py-2.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold rounded-full flex items-center justify-center gap-2 shadow-sm transition-all"
-                >
-                  <span>Open MongoDB Atlas Console</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-gold-light" />
-                </a>
-
-                <button
-                  onClick={handleSeed}
-                  disabled={isSeeding}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-gold hover:bg-gold-light text-burgundy-deep text-xs font-semibold rounded-full shadow-gold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isSeeding ? "Seeding Catalog..." : "Seed Catalog to Atlas"}</span>
-                </button>
-
-                <button
-                  onClick={() => setIsAtlasModalOpen(false)}
-                  className="w-full sm:w-auto sm:ml-auto px-4 py-2.5 border border-blush hover:bg-cream-soft text-charcoal-muted text-xs font-semibold rounded-full transition-all"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
       </div>
     </div>
