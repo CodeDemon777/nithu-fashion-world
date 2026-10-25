@@ -11,7 +11,6 @@ import {
   Phone,
   Sparkles,
   ArrowRight,
-  UserCheck,
   CheckCircle2,
   ShieldCheck,
   ArrowLeft,
@@ -26,7 +25,6 @@ export const AuthModal: React.FC = () => {
     authModalTab,
     setAuthModalTab,
     login,
-    loginAsDemoCustomer,
     sendPhoneOtp,
     verifyPhoneOtp,
   } = useAuth();
@@ -580,27 +578,6 @@ export const AuthModal: React.FC = () => {
           </form>
         )}
 
-        {/* 1-Click Quick Demo Login Box (For Testing Customer Features) */}
-        {signupStep === "form" && (
-          <div className="mt-6 pt-5 border-t border-blush/80">
-            <div className="text-center text-[11px] font-semibold text-charcoal-muted uppercase tracking-wider mb-2.5">
-              ⚡ Quick Demo Login
-            </div>
-            <button
-              onClick={() => {
-                loginAsDemoCustomer();
-                showToast("Logged in as Customer (Priya) 🛍️");
-              }}
-              className="w-full p-2.5 bg-cream-soft hover:bg-blush-light border border-blush rounded-xl text-center transition-all group flex items-center justify-between px-4"
-            >
-              <div className="text-xs font-semibold text-burgundy flex items-center gap-2">
-                <UserCheck className="w-4 h-4 text-gold-dark" />
-                <span>Customer Demo Account</span>
-              </div>
-              <span className="text-[11px] text-charcoal-muted group-hover:text-burgundy">Priya Sundaram →</span>
-            </button>
-          </div>
-        )}
 
       </div>
     </div>

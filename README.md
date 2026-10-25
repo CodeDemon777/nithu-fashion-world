@@ -41,11 +41,11 @@ A luxury fashion, bridal boutique, and custom tailoring e-commerce web applicati
 - Administrator access is strictly protected. Authorized admins authenticate via manual email & password verification backed by salted scrypt cryptographic hashing in MongoDB Atlas.
 - No administrator credentials or bypass shortcuts are exposed publicly.
 
-### 🛍️ Customer Account (Demo)
+### 🛍️ Customer Account
 - **URL**: `/account`
-- **Email**: `priya@example.com`
-- **Password**: `user123`
-- *(Or use the 1-click **Customer Demo Account** button in the Sign In modal)*
+- New customers register with 6-digit phone OTP verification.
+- Existing customers sign in using their registered email and password.
+- Sample seeded test credentials: `priya@example.com` / `user123` (or register any new number via OTP).
 
 ---
 

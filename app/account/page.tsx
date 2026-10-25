@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useShop } from "@/context/ShopContext";
 import {
@@ -20,9 +20,7 @@ import {
   Save,
   MessageCircle,
   Lock,
-  Key,
   ShieldCheck,
-  UserCheck,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -34,14 +32,13 @@ export default function CustomerAccountPage() {
     updateProfile,
     setIsAuthModalOpen,
     setAuthModalTab,
-    loginAsDemoCustomer,
   } = useAuth();
   const { orders, tailoringInquiries, wishlist, products, addToCart, showToast } = useShop();
 
   const [activeTab, setActiveTab] = useState<"orders" | "tailoring" | "wishlist" | "profile">("orders");
 
   // Customer Sign-In form state
-  const [custEmail, setCustEmail] = useState("priya@example.com");
+  const [custEmail, setCustEmail] = useState("");
   const [custPassword, setCustPassword] = useState("");
   const [custLoginError, setCustLoginError] = useState("");
   const [isCustLoggingIn, setIsCustLoggingIn] = useState(false);
@@ -69,12 +66,19 @@ export default function CustomerAccountPage() {
   }, [tailoringInquiries, user]);
 
   // Profile Form state
-  const [profileName, setProfileName] = useState(user?.name || "Priya Sundaram");
-  const [profilePhone, setProfilePhone] = useState(user?.phone || "9876543210");
-  const [profileCity, setProfileCity] = useState(user?.city || "Komarapalayam");
-  const [profileAddress, setProfileAddress] = useState(
-    user?.address || "14/B, Gandhi Nagar, Near Saree Market, Komarapalayam - 638183"
-  );
+  const [profileName, setProfileName] = useState(user?.name || "");
+  const [profilePhone, setProfilePhone] = useState(user?.phone || "");
+  const [profileCity, setProfileCity] = useState(user?.city || "");
+  const [profileAddress, setProfileAddress] = useState(user?.address || "");
+
+  useEffect(() => {
+    if (user) {
+      setProfileName(user.name || "");
+      setProfilePhone(user.phone || "");
+      setProfileCity(user.city || "");
+      setProfileAddress(user.address || "");
+    }
+  }, [user]);
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,46 +145,6 @@ export default function CustomerAccountPage() {
             </div>
           )}
 
-          {/* Customer Credentials Helper Badge */}
-          <div className="bg-[#FFF9F3] rounded-2xl p-3.5 border border-gold/30 text-xs space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-bold text-burgundy">
-              <span className="flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-gold-dark" />
-                <span>Customer Demo Accounts</span>
-              </span>
-              <span className="text-[10px] text-charcoal-muted font-normal">MongoDB Atlas</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-[10px] bg-white p-2 rounded-xl border border-blush/60 font-mono">
-              <button
-                type="button"
-                onClick={() => {
-                  setCustEmail("priya@example.com");
-                  setCustPassword("user123");
-                  showToast("Filled Priya's Credentials ✨");
-                }}
-                className="text-left p-1 rounded hover:bg-cream-soft transition-colors"
-              >
-                <div className="font-sans font-bold text-burgundy">1. Priya (Customer)</div>
-                <div className="text-charcoal-muted">priya@example.com</div>
-                <div className="text-charcoal font-semibold">pass: user123</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setCustEmail("divya@example.com");
-                  setCustPassword("user123");
-                  showToast("Filled Divya's Credentials ✨");
-                }}
-                className="text-left p-1 rounded hover:bg-cream-soft transition-colors"
-              >
-                <div className="font-sans font-bold text-burgundy">2. Divya (Customer)</div>
-                <div className="text-charcoal-muted">divya@example.com</div>
-                <div className="text-charcoal font-semibold">pass: user123</div>
-              </button>
-            </div>
-          </div>
-
           {/* Form */}
           <form onSubmit={handleCustomerLogin} className="space-y-4">
             <div>
@@ -192,7 +156,7 @@ export default function CustomerAccountPage() {
                 <input
                   type="email"
                   required
-                  placeholder="priya@example.com"
+                  placeholder="you@example.com"
                   value={custEmail}
                   onChange={(e) => setCustEmail(e.target.value)}
                   className="w-full bg-cream-soft text-charcoal text-xs pl-9 pr-3 py-3 rounded-xl border border-blush focus:border-burgundy outline-none"
@@ -233,20 +197,8 @@ export default function CustomerAccountPage() {
             </button>
           </form>
 
-          {/* 1-Click Demo Shortcut & Register */}
-          <div className="pt-4 border-t border-blush text-center space-y-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                loginAsDemoCustomer();
-                showToast("Logged in as Demo Customer (Priya) ✨");
-              }}
-              className="w-full py-2.5 bg-cream-soft hover:bg-blush-light text-burgundy border border-blush text-xs font-semibold rounded-full transition-all flex items-center justify-center gap-2"
-            >
-              <UserCheck className="w-3.5 h-3.5 text-burgundy" />
-              <span>1-Click Quick Demo Login (Priya)</span>
-            </button>
-
+          {/* Register Link */}
+          <div className="pt-4 border-t border-blush text-center">
             <button
               type="button"
               onClick={() => {
