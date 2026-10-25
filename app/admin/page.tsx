@@ -44,7 +44,6 @@ export default function AdminPortalPage() {
     user,
     login,
     logout,
-    loginAsDemoAdmin,
     customersList,
     isLoadingCustomers,
     refreshCustomers,
@@ -97,7 +96,7 @@ export default function AdminPortalPage() {
   const [newProdImage, setNewProdImage] = useState("/images/categories/sarees.jpg");
 
   // Admin Sign-In Form State
-  const [adminEmail, setAdminEmail] = useState("admin@nithufashion.com");
+  const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [adminLoginError, setAdminLoginError] = useState("");
   const [isAdminLoggingIn, setIsAdminLoggingIn] = useState(false);
@@ -305,13 +304,13 @@ export default function AdminPortalPage() {
           <div className="space-y-3 pt-2">
             <button
               onClick={() => {
-                loginAsDemoAdmin();
-                showToast("Switched to Administrator Account 👑");
+                logout();
+                showToast("Signed out. Please enter administrator credentials.");
               }}
-              className="w-full py-3.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold uppercase tracking-wider rounded-full shadow-md transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold uppercase tracking-wider rounded-full shadow-md transition-all flex items-center justify-center gap-2"
             >
-              <ShieldCheck className="w-4 h-4 text-gold-light" />
-              <span>Switch to Store Admin (Nithu Admin)</span>
+              <LogOut className="w-4 h-4 text-gold-light" />
+              <span>Sign Out & Enter Administrator Credentials</span>
             </button>
 
             <div className="grid grid-cols-2 gap-2.5">
@@ -364,37 +363,6 @@ export default function AdminPortalPage() {
             </div>
           )}
 
-          {/* Admin Credentials Helper Badge */}
-          <div className="bg-[#FFF9F3] rounded-2xl p-3.5 border border-gold/30 text-xs space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-bold text-burgundy">
-              <span className="flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-gold-dark" />
-                <span>Admin Credentials (Atlas Verified)</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminEmail("admin@nithufashion.com");
-                  setAdminPassword("admin123");
-                  showToast("Filled Admin Credentials ✨");
-                }}
-                className="text-[10px] text-gold-dark underline hover:text-burgundy font-semibold"
-              >
-                Auto Fill
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-[11px] bg-white p-2 rounded-xl border border-blush/60 font-mono">
-              <div>
-                <span className="text-charcoal-muted block text-[9px] font-sans uppercase">Email:</span>
-                <span className="text-charcoal select-all">admin@nithufashion.com</span>
-              </div>
-              <div>
-                <span className="text-charcoal-muted block text-[9px] font-sans uppercase">Password:</span>
-                <span className="text-charcoal select-all">admin123</span>
-              </div>
-            </div>
-          </div>
-
           {/* Form */}
           <form onSubmit={handleAdminManualLogin} className="space-y-4">
             <div>
@@ -406,7 +374,7 @@ export default function AdminPortalPage() {
                 <input
                   type="email"
                   required
-                  placeholder="admin@nithufashion.com"
+                  placeholder="admin@example.com"
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
                   className="w-full bg-cream-soft text-charcoal text-xs pl-9 pr-3 py-3 rounded-xl border border-blush focus:border-burgundy outline-none"
@@ -447,23 +415,10 @@ export default function AdminPortalPage() {
             </button>
           </form>
 
-          {/* 1-Click Quick Demo Login Box */}
-          <div className="pt-4 border-t border-blush text-center space-y-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                loginAsDemoAdmin();
-                showToast("Authenticated as Store Admin 👑");
-              }}
-              className="w-full py-2.5 bg-gold/15 hover:bg-gold/25 text-burgundy-deep border border-gold/40 text-xs font-semibold rounded-full transition-all flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
-              <span>1-Click Demo Admin Login</span>
-            </button>
-
+          <div className="pt-4 border-t border-blush text-center">
             <Link
               href="/"
-              className="block text-center text-xs text-charcoal-muted hover:text-burgundy pt-1"
+              className="inline-flex items-center gap-1.5 text-xs text-charcoal-muted hover:text-burgundy transition"
             >
               ← Return to Homepage
             </Link>

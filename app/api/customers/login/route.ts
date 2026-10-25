@@ -34,13 +34,12 @@ export async function POST(req: Request) {
     }
 
     if (!isDbConfigured()) {
-      // Local fallback for quick demo login
-      const isDemoAdmin = cleanEmail.includes("admin");
+      // Local fallback for customer login
       const fallbackUser = {
-        id: isDemoAdmin ? "usr-admin" : "usr-cust-" + Date.now(),
-        name: isDemoAdmin ? "Nithu Admin" : cleanEmail.split("@")[0].toUpperCase(),
+        id: "usr-cust-" + Date.now(),
+        name: cleanEmail.split("@")[0].toUpperCase(),
         email: cleanEmail,
-        role: isDemoAdmin ? "admin" : "customer",
+        role: "customer",
         city: "Komarapalayam, Tamil Nadu",
         joinedDate: "Feb 2026",
       };
@@ -58,14 +57,13 @@ export async function POST(req: Request) {
 
     if (!customer) {
       // Auto-create customer if logging in first time with salted scrypt hash
-      const isDemoAdmin = cleanEmail.includes("admin");
       const hashedPassword = hashPassword(cleanPassword);
 
       const created = await CustomerModel.create({
         name: cleanEmail.split("@")[0].toUpperCase(),
         email: cleanEmail,
         password: hashedPassword,
-        role: isDemoAdmin ? "admin" : "customer",
+        role: "customer",
         city: "Tamil Nadu",
         joinedDate: new Date().toLocaleDateString("en-US", {
           month: "short",

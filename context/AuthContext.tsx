@@ -13,7 +13,6 @@ interface AuthContextType {
   setIsAuthModalOpen: (open: boolean) => void;
   authModalTab: "login" | "signup";
   setAuthModalTab: (tab: "login" | "signup") => void;
-  loginAsDemoAdmin: () => void;
   loginAsDemoCustomer: () => void;
   customersList: User[];
   isLoadingCustomers: boolean;
@@ -21,21 +20,6 @@ interface AuthContextType {
 }
 
 const DEMO_USERS: (User & { password: string })[] = [
-  {
-    id: "usr-admin",
-    name: "Nithu Admin",
-    email: "admin@nithufashion.com",
-    phone: "7373848555",
-    address: "Bazaar Street, Main Tailoring Unit",
-    city: "Komarapalayam",
-    pincode: "638183",
-    role: "admin",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-    joinedDate: "Jan 2024",
-    password: "admin123",
-    totalOrders: 0,
-    totalSpent: 0,
-  },
   {
     id: "usr-cust-1",
     name: "Priya Sundaram",
@@ -142,12 +126,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
 
-    // Default auto-create user session
+    // Default auto-create customer session
     const newUser: User = {
       id: "usr-" + Date.now(),
       name: email.split("@")[0].toUpperCase(),
       email,
-      role: email.toLowerCase().includes("admin") ? "admin" : "customer",
+      role: "customer",
       city: "Tamil Nadu",
       joinedDate: "Just now",
       totalOrders: 0,
@@ -197,7 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name,
       email,
       phone,
-      role: email.toLowerCase().includes("admin") ? "admin" : "customer",
+      role: "customer",
       address: "Tamil Nadu, India",
       city: "Komarapalayam",
       joinedDate: "Just now",
@@ -232,15 +216,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginAsDemoAdmin = () => {
-    const admin = DEMO_USERS[0];
-    const { password, ...safeUser } = admin;
-    saveUserSession(safeUser);
-    setIsAuthModalOpen(false);
-  };
-
   const loginAsDemoCustomer = () => {
-    const cust = DEMO_USERS[1];
+    const cust = DEMO_USERS[0];
     const { password, ...safeUser } = cust;
     saveUserSession(safeUser);
     setIsAuthModalOpen(false);
@@ -258,7 +235,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAuthModalOpen,
         authModalTab,
         setAuthModalTab,
-        loginAsDemoAdmin,
         loginAsDemoCustomer,
         customersList,
         isLoadingCustomers,

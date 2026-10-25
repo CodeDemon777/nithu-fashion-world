@@ -13,7 +13,6 @@ export const AuthModal: React.FC = () => {
     setAuthModalTab,
     login,
     signup,
-    loginAsDemoAdmin,
     loginAsDemoCustomer,
   } = useAuth();
 
@@ -238,37 +237,21 @@ export const AuthModal: React.FC = () => {
         {/* 1-Click Quick Demo Login Box */}
         <div className="mt-6 pt-5 border-t border-blush/80">
           <div className="text-center text-[11px] font-semibold text-charcoal-muted uppercase tracking-wider mb-2.5">
-            ⚡ Quick 1-Click Demo Logins
+            ⚡ Quick Demo Login
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              onClick={() => {
-                loginAsDemoCustomer();
-                showToast("Logged in as Customer (Priya) 🛍️");
-              }}
-              className="p-2.5 bg-cream-soft hover:bg-blush-light border border-blush rounded-xl text-center transition-all group"
-            >
-              <div className="text-xs font-semibold text-burgundy flex items-center justify-center gap-1">
-                <UserCheck className="w-3.5 h-3.5" />
-                <span>Customer</span>
-              </div>
-              <span className="text-[10px] text-charcoal-muted">Priya Sundaram</span>
-            </button>
-
-            <button
-              onClick={() => {
-                loginAsDemoAdmin();
-                showToast("Logged in as Store Admin 👑");
-              }}
-              className="p-2.5 bg-burgundy/10 hover:bg-burgundy/20 border border-burgundy/30 rounded-xl text-center transition-all group"
-            >
-              <div className="text-xs font-semibold text-burgundy-deep flex items-center justify-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-gold-dark" />
-                <span>Admin Portal</span>
-              </div>
-              <span className="text-[10px] text-charcoal-muted">Nithu Admin</span>
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              loginAsDemoCustomer();
+              showToast("Logged in as Customer (Priya) 🛍️");
+            }}
+            className="w-full p-2.5 bg-cream-soft hover:bg-blush-light border border-blush rounded-xl text-center transition-all group flex items-center justify-between px-4"
+          >
+            <div className="text-xs font-semibold text-burgundy flex items-center gap-2">
+              <UserCheck className="w-4 h-4 text-gold-dark" />
+              <span>Customer Demo Account</span>
+            </div>
+            <span className="text-[11px] text-charcoal-muted group-hover:text-burgundy">Priya Sundaram →</span>
+          </button>
         </div>
 
       </div>

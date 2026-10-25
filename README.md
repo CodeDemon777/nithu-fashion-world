@@ -34,19 +34,18 @@ A luxury fashion, bridal boutique, and custom tailoring e-commerce web applicati
 
 ---
 
-## 🔑 Login Credentials
+## 🔑 Portal Access & Authentication
 
 ### 👑 Administrator Account
-- **URL**: `/admin` (or click *Sign In* modal)
-- **Email**: `admin@nithufashion.com`
-- **Password**: `admin123`
-- *(Or use the 1-click **Admin Portal** demo button in the Sign In modal)*
+- **URL**: `/admin`
+- Administrator access is strictly protected. Authorized admins authenticate via manual email & password verification backed by salted scrypt cryptographic hashing in MongoDB Atlas.
+- No administrator credentials or bypass shortcuts are exposed publicly.
 
-### 🛍️ Customer Account
+### 🛍️ Customer Account (Demo)
 - **URL**: `/account`
 - **Email**: `priya@example.com`
 - **Password**: `user123`
-- *(Or use the 1-click **Customer** demo button in the Sign In modal)*
+- *(Or use the 1-click **Customer Demo Account** button in the Sign In modal)*
 
 ---
 
