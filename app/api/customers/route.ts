@@ -20,6 +20,7 @@ const DEFAULT_DEMO_CUSTOMERS = [
     joinedDate: "Feb 2026",
     totalOrders: 3,
     totalSpent: 4296,
+    phoneVerified: true,
   },
   {
     id: "demo-cust-2",
@@ -34,6 +35,7 @@ const DEFAULT_DEMO_CUSTOMERS = [
     joinedDate: "Jan 2026",
     totalOrders: 2,
     totalSpent: 2698,
+    phoneVerified: true,
   },
   {
     id: "demo-cust-3",
@@ -48,6 +50,7 @@ const DEFAULT_DEMO_CUSTOMERS = [
     joinedDate: "Jan 2024",
     totalOrders: 0,
     totalSpent: 0,
+    phoneVerified: true,
   },
 ];
 
@@ -93,6 +96,7 @@ export async function GET(req: Request) {
           joinedDate: "Feb 2026",
           totalOrders: 3,
           totalSpent: 4296,
+          phoneVerified: true,
         },
         {
           name: "Divya Ramesh",
@@ -107,6 +111,7 @@ export async function GET(req: Request) {
           joinedDate: "Jan 2026",
           totalOrders: 2,
           totalSpent: 2698,
+          phoneVerified: true,
         },
         {
           name: "Nithu Admin",
@@ -121,6 +126,7 @@ export async function GET(req: Request) {
           joinedDate: "Jan 2024",
           totalOrders: 0,
           totalSpent: 0,
+          phoneVerified: true,
         },
       ]);
 

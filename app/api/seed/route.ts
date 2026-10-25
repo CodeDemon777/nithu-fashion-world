@@ -20,6 +20,7 @@ const DEFAULT_CUSTOMERS = [
     joinedDate: "Feb 2026",
     totalOrders: 3,
     totalSpent: 4296,
+    phoneVerified: true,
   },
   {
     name: "Divya Ramesh",
@@ -33,6 +34,7 @@ const DEFAULT_CUSTOMERS = [
     joinedDate: "Jan 2026",
     totalOrders: 2,
     totalSpent: 2698,
+    phoneVerified: true,
   },
   {
     name: "Nithu Admin",
@@ -46,6 +48,7 @@ const DEFAULT_CUSTOMERS = [
     joinedDate: "Jan 2024",
     totalOrders: 0,
     totalSpent: 0,
+    phoneVerified: true,
   },
 ];
 

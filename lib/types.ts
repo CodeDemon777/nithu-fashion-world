@@ -62,6 +62,8 @@ export interface User {
   joinedDate: string;
   totalOrders?: number;
   totalSpent?: number;
+  phoneVerified?: boolean;
+  phoneVerifiedAt?: string;
 }
 
 export interface OrderItem {

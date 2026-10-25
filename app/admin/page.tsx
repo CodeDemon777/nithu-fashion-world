@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useShop } from "@/context/ShopContext";
-import { Product, Order, TailoringInquiry } from "@/lib/types";
+import { Product, Order, TailoringInquiry, User } from "@/lib/types";
 import {
   ShieldCheck,
   Package,
@@ -35,6 +35,11 @@ import {
   LogOut,
   Key,
   UserCheck,
+  LayoutGrid,
+  Table,
+  PhoneCall,
+  CheckCircle2,
+  Shield,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -69,6 +74,9 @@ export default function AdminPortalPage() {
   const [productStockFilter, setProductStockFilter] = useState<"all" | "inStock" | "outOfStock">("all");
 
   const [customerSearch, setCustomerSearch] = useState("");
+  const [customerFilter, setCustomerFilter] = useState<"all" | "verified" | "withOrders" | "admins">("all");
+  const [customerViewMode, setCustomerViewMode] = useState<"cards" | "table">("cards");
+  const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null);
 
   const [orderSearch, setOrderSearch] = useState("");
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
@@ -145,19 +153,36 @@ export default function AdminPortalPage() {
     });
   }, [tailoringInquiries, inquirySearch, inquiryStatusFilter]);
 
-  // Filtered Customers
+  // Filtered Customers with Phone Verification & Role Filters
   const filteredCustomers = useMemo(() => {
     return customersList.filter((c) => {
       const term = customerSearch.toLowerCase();
-      return (
+      const matchesSearch =
         c.name.toLowerCase().includes(term) ||
         c.email.toLowerCase().includes(term) ||
         (c.phone && c.phone.includes(term)) ||
         (c.city && c.city.toLowerCase().includes(term)) ||
-        (c.address && c.address.toLowerCase().includes(term))
-      );
+        (c.address && c.address.toLowerCase().includes(term)) ||
+        (c.pincode && c.pincode.includes(term));
+
+      const matchesFilter =
+        customerFilter === "all" ||
+        (customerFilter === "verified" && c.phoneVerified) ||
+        (customerFilter === "withOrders" && (c.totalOrders || 0) > 0) ||
+        (customerFilter === "admins" && c.role === "admin");
+
+      return matchesSearch && matchesFilter;
     });
-  }, [customersList, customerSearch]);
+  }, [customersList, customerSearch, customerFilter]);
+
+  // Customer Metrics Summary
+  const customerStats = useMemo(() => {
+    const total = customersList.length;
+    const verified = customersList.filter((c) => c.phoneVerified).length;
+    const active = customersList.filter((c) => (c.totalOrders || 0) > 0).length;
+    const revenue = customersList.reduce((sum, c) => sum + (c.totalSpent || 0), 0);
+    return { total, verified, active, revenue };
+  }, [customersList]);
 
   const handleRefreshAll = async () => {
     setIsRefreshing(true);
@@ -925,9 +950,10 @@ export default function AdminPortalPage() {
           </div>
         )}
 
-        {/* Tab: Customer Details (MongoDB Atlas) */}
+        {/* Tab: Customer Directory & Profiles (MongoDB Atlas) */}
         {activeTab === "customers" && (
           <div className="bg-white rounded-3xl p-5 sm:p-8 border border-blush shadow-card space-y-6 animate-fadeIn">
+            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-cream-warm gap-3">
               <div>
                 <div className="flex items-center gap-2.5">
@@ -938,11 +964,11 @@ export default function AdminPortalPage() {
                     Customer Directory & Profiles ({filteredCustomers.length} of {customersList.length})
                   </h2>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
-                    <Database className="w-3 h-3" /> MongoDB Atlas
+                    <Database className="w-3 h-3" /> MongoDB Atlas Verified
                   </span>
                 </div>
                 <p className="text-xs text-charcoal-muted mt-1">
-                  Customer records, delivery addresses, phone numbers, and lifetime order values stored in MongoDB Atlas.
+                  Verified customer records, phone OTP statuses, delivery addresses, and lifetime order metrics.
                 </p>
               </div>
 
@@ -950,7 +976,8 @@ export default function AdminPortalPage() {
                 <button
                   onClick={handleRefreshAll}
                   disabled={isRefreshing}
-                  className="px-3.5 py-2 bg-cream-soft hover:bg-blush border border-blush text-burgundy text-xs font-semibold rounded-full flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="px-3.5 py-2 bg-cream-soft hover:bg-blush border border-blush text-burgundy text-xs font-semibold rounded-full flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
+                  title="Sync customer records with MongoDB Atlas"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
                   <span>Sync from Atlas</span>
@@ -958,29 +985,144 @@ export default function AdminPortalPage() {
               </div>
             </div>
 
-            {/* Search Box */}
-            <div className="relative flex items-center bg-cream-soft p-3 rounded-2xl border border-blush">
-              <Search className="w-4 h-4 text-charcoal-muted absolute left-6" />
-              <input
-                type="text"
-                placeholder="Search customers by name, email, phone number, address, or city..."
-                value={customerSearch}
-                onChange={(e) => setCustomerSearch(e.target.value)}
-                className="w-full text-xs bg-white pl-10 pr-4 py-2.5 rounded-xl border border-blush outline-none focus:border-burgundy"
-              />
+            {/* Customer Stats Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <div className="bg-cream-soft/60 border border-blush p-4 rounded-2xl">
+                <div className="flex items-center justify-between text-xs text-charcoal-muted">
+                  <span className="font-semibold uppercase text-[10px]">Total Customers</span>
+                  <Users className="w-4 h-4 text-burgundy" />
+                </div>
+                <div className="text-2xl font-serif font-bold text-charcoal mt-1">
+                  {customerStats.total}
+                </div>
+                <span className="text-[10px] text-charcoal-muted">All registered profiles</span>
+              </div>
+
+              <div className="bg-emerald-50/70 border border-emerald-200/80 p-4 rounded-2xl">
+                <div className="flex items-center justify-between text-xs text-emerald-800">
+                  <span className="font-semibold uppercase text-[10px]">Phone Verified</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div className="text-2xl font-serif font-bold text-emerald-900 mt-1">
+                  {customerStats.verified}
+                </div>
+                <span className="text-[10px] text-emerald-700">Mobile OTP authenticated</span>
+              </div>
+
+              <div className="bg-gold/15 border border-gold/40 p-4 rounded-2xl">
+                <div className="flex items-center justify-between text-xs text-burgundy">
+                  <span className="font-semibold uppercase text-[10px]">Active Buyers</span>
+                  <ShoppingBag className="w-4 h-4 text-gold-dark" />
+                </div>
+                <div className="text-2xl font-serif font-bold text-charcoal mt-1">
+                  {customerStats.active}
+                </div>
+                <span className="text-[10px] text-charcoal-muted">With 1+ orders placed</span>
+              </div>
+
+              <div className="bg-burgundy/10 border border-burgundy/25 p-4 rounded-2xl">
+                <div className="flex items-center justify-between text-xs text-burgundy">
+                  <span className="font-semibold uppercase text-[10px]">Lifetime Spend</span>
+                  <DollarSign className="w-4 h-4 text-burgundy" />
+                </div>
+                <div className="text-2xl font-serif font-bold text-burgundy-deep mt-1">
+                  ₹{customerStats.revenue.toLocaleString("en-IN")}
+                </div>
+                <span className="text-[10px] text-charcoal-muted">Customer gross value</span>
+              </div>
             </div>
 
+            {/* Search, Filter Pills & View Mode Bar */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+              {/* Search Box */}
+              <div className="relative flex-1 flex items-center bg-cream-soft rounded-2xl border border-blush">
+                <Search className="w-4 h-4 text-charcoal-muted absolute left-4" />
+                <input
+                  type="text"
+                  placeholder="Search by name, email, phone (+91), address, city, or pincode..."
+                  value={customerSearch}
+                  onChange={(e) => setCustomerSearch(e.target.value)}
+                  className="w-full text-xs bg-white pl-10 pr-4 py-2.5 rounded-xl border border-blush outline-none focus:border-burgundy"
+                />
+                {customerSearch && (
+                  <button
+                    onClick={() => setCustomerSearch("")}
+                    className="absolute right-3 text-charcoal-muted hover:text-burgundy"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* View Toggle */}
+              <div className="flex items-center gap-1.5 self-end sm:self-auto bg-cream-soft p-1 rounded-2xl border border-blush">
+                <button
+                  type="button"
+                  onClick={() => setCustomerViewMode("cards")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    customerViewMode === "cards"
+                      ? "bg-white text-burgundy shadow-sm"
+                      : "text-charcoal-muted hover:text-charcoal"
+                  }`}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  <span>Cards</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCustomerViewMode("table")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    customerViewMode === "table"
+                      ? "bg-white text-burgundy shadow-sm"
+                      : "text-charcoal-muted hover:text-charcoal"
+                  }`}
+                >
+                  <Table className="w-3.5 h-3.5" />
+                  <span>Table</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+              <span className="text-charcoal-muted text-[11px] font-semibold flex items-center gap-1 flex-shrink-0">
+                <Filter className="w-3 h-3 text-burgundy" /> Filter:
+              </span>
+              {[
+                { id: "all", label: `All (${customersList.length})` },
+                { id: "verified", label: `Phone Verified (${customerStats.verified})` },
+                { id: "withOrders", label: `With Orders (${customerStats.active})` },
+                { id: "admins", label: `Admins (${customersList.filter((c) => c.role === "admin").length})` },
+              ].map((pill) => (
+                <button
+                  key={pill.id}
+                  type="button"
+                  onClick={() => setCustomerFilter(pill.id as any)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                    customerFilter === pill.id
+                      ? "bg-burgundy text-cream shadow-sm"
+                      : "bg-cream-soft hover:bg-blush text-charcoal-muted border border-blush"
+                  }`}
+                >
+                  {pill.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Customer List Content */}
             {isLoadingCustomers ? (
               <div className="py-16 text-center text-charcoal-muted text-xs space-y-2">
                 <RefreshCw className="w-6 h-6 animate-spin mx-auto text-burgundy" />
-                <p>Loading customers from MongoDB Atlas...</p>
+                <p>Loading customer profiles from MongoDB Atlas...</p>
               </div>
             ) : filteredCustomers.length === 0 ? (
-              <div className="py-16 text-center text-charcoal-muted text-xs space-y-3">
+              <div className="py-16 text-center text-charcoal-muted text-xs space-y-3 bg-cream-soft/30 rounded-2xl border border-dashed border-blush">
                 <Users className="w-10 h-10 text-charcoal-muted/40 mx-auto" />
-                <p>No customer records match your search criteria.</p>
+                <p className="font-semibold text-charcoal">No customer records found</p>
+                <p className="text-[11px]">No profiles match your search criteria or filter.</p>
               </div>
-            ) : (
+            ) : customerViewMode === "cards" ? (
+              /* CARD VIEW */
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredCustomers.map((cust) => {
                   const cleanPhone = cust.phone ? cust.phone.replace(/[^0-9]/g, "") : "";
@@ -1007,15 +1149,28 @@ export default function AdminPortalPage() {
                               <h4 className="font-serif font-bold text-charcoal text-base">
                                 {cust.name}
                               </h4>
-                              <span
-                                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                                  cust.role === "admin"
-                                    ? "bg-gold/20 text-burgundy border border-gold/40"
-                                    : "bg-white text-charcoal-muted border border-blush"
-                                }`}
-                              >
-                                {cust.role === "admin" ? "Administrator 👑" : "Customer Account"}
-                              </span>
+                              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                <span
+                                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                                    cust.role === "admin"
+                                      ? "bg-gold/20 text-burgundy border border-gold/40"
+                                      : "bg-white text-charcoal-muted border border-blush"
+                                  }`}
+                                >
+                                  {cust.role === "admin" ? "Administrator 👑" : "Customer"}
+                                </span>
+                                {cust.phoneVerified ? (
+                                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-300">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    <span>Verified</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] bg-amber-50 text-amber-700 font-medium px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-200">
+                                    <Clock className="w-3 h-3 text-amber-600" />
+                                    <span>Unverified</span>
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1031,7 +1186,7 @@ export default function AdminPortalPage() {
                           {cust.phone && (
                             <div className="flex items-center gap-2 text-charcoal">
                               <Phone className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-                              <span>{cust.phone}</span>
+                              <span className="font-mono text-[11px]">+91 {cleanPhone.slice(-10)}</span>
                             </div>
                           )}
 
@@ -1064,13 +1219,13 @@ export default function AdminPortalPage() {
                         <div className="flex items-center gap-2">
                           {cleanPhone ? (
                             <a
-                              href={`https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(cust.name)},%20greetings%20from%20Nithu%20Fashion%20World!`}
+                              href={`https://wa.me/91${cleanPhone.slice(-10)}?text=Hello%20${encodeURIComponent(cust.name)},%20greetings%20from%20Nithu%20Fashion%20World!`}
                               target="_blank"
                               rel="noreferrer"
                               className="flex-1 py-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all"
                             >
                               <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                              <span>WhatsApp Customer</span>
+                              <span>WhatsApp</span>
                             </a>
                           ) : (
                             <a
@@ -1078,14 +1233,140 @@ export default function AdminPortalPage() {
                               className="flex-1 py-2 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all"
                             >
                               <Mail className="w-3.5 h-3.5" />
-                              <span>Send Email</span>
+                              <span>Email</span>
                             </a>
                           )}
+
+                          <button
+                            type="button"
+                            onClick={() => setSelectedCustomer(cust)}
+                            className="px-3 py-2 bg-cream-soft hover:bg-blush border border-blush text-burgundy text-xs font-semibold rounded-xl flex items-center justify-center gap-1 transition-all"
+                            title="Inspect full customer profile"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Details</span>
+                          </button>
                         </div>
                       </div>
                     </div>
                   );
                 })}
+              </div>
+            ) : (
+              /* TABLE VIEW */
+              <div className="overflow-x-auto rounded-2xl border border-blush">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#FFF9F2] text-burgundy font-serif font-bold uppercase text-[11px] border-b border-blush">
+                    <tr>
+                      <th className="py-3 px-4">Customer</th>
+                      <th className="py-3 px-4">Contact Info</th>
+                      <th className="py-3 px-4">OTP Status</th>
+                      <th className="py-3 px-4">Location</th>
+                      <th className="py-3 px-4 text-center">Orders</th>
+                      <th className="py-3 px-4 text-right">Lifetime Spent</th>
+                      <th className="py-3 px-4 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-blush/60">
+                    {filteredCustomers.map((cust) => {
+                      const cleanPhone = cust.phone ? cust.phone.replace(/[^0-9]/g, "") : "";
+                      return (
+                        <tr key={cust.id || cust.email} className="hover:bg-cream-soft/40 transition-colors">
+                          {/* Customer */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2.5">
+                              {cust.avatar ? (
+                                <img
+                                  src={cust.avatar}
+                                  alt={cust.name}
+                                  className="w-8 h-8 rounded-full object-cover border border-gold/40 flex-shrink-0"
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-burgundy/10 text-burgundy font-serif font-bold flex items-center justify-center flex-shrink-0">
+                                  {cust.name.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                              <div>
+                                <span className="font-semibold text-charcoal block">{cust.name}</span>
+                                <span className="text-[10px] text-charcoal-muted">Joined {cust.joinedDate || "Recent"}</span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Contact Info */}
+                          <td className="py-3 px-4">
+                            <div className="space-y-0.5">
+                              <span className="block text-charcoal truncate max-w-[180px]">{cust.email}</span>
+                              <span className="block text-charcoal-muted font-mono text-[11px]">
+                                {cleanPhone ? `+91 ${cleanPhone.slice(-10)}` : "No Phone"}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* OTP Status */}
+                          <td className="py-3 px-4">
+                            {cust.phoneVerified ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span>Verified Mobile</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                                <Clock className="w-3 h-3 text-amber-600" />
+                                <span>Unverified</span>
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Location */}
+                          <td className="py-3 px-4 max-w-[180px]">
+                            <span className="block text-charcoal truncate">
+                              {cust.city || "Tamil Nadu"} {cust.pincode ? `(${cust.pincode})` : ""}
+                            </span>
+                            <span className="block text-[10px] text-charcoal-muted truncate">
+                              {cust.address || "Address not provided"}
+                            </span>
+                          </td>
+
+                          {/* Orders */}
+                          <td className="py-3 px-4 text-center font-bold text-burgundy">
+                            {cust.totalOrders || 0}
+                          </td>
+
+                          {/* Spent */}
+                          <td className="py-3 px-4 text-right font-bold text-charcoal">
+                            ₹{(cust.totalSpent || 0).toLocaleString("en-IN")}
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center justify-center gap-1.5">
+                              {cleanPhone && (
+                                <a
+                                  href={`https://wa.me/91${cleanPhone.slice(-10)}?text=Hello%20${encodeURIComponent(cust.name)},%20greetings%20from%20Nithu%20Fashion%20World!`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="p-1.5 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366] text-[#25D366] hover:text-white transition-all"
+                                  title="Chat on WhatsApp"
+                                >
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => setSelectedCustomer(cust)}
+                                className="p-1.5 rounded-lg bg-burgundy/10 hover:bg-burgundy text-burgundy hover:text-cream transition-all"
+                                title="Inspect Profile"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
@@ -1583,8 +1864,160 @@ export default function AdminPortalPage() {
           </div>
         )}
 
+        {/* Modal: Customer Details Inspection */}
+        {selectedCustomer && (
+          <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fadeIn">
+            <div className="relative bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-blush space-y-6 max-h-[90vh] overflow-y-auto">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-cream-warm">
+                <div className="flex items-center gap-3.5">
+                  {selectedCustomer.avatar ? (
+                    <img
+                      src={selectedCustomer.avatar}
+                      alt={selectedCustomer.name}
+                      className="w-14 h-14 rounded-full object-cover border-2 border-gold flex-shrink-0 shadow-sm"
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-full bg-burgundy/10 text-burgundy font-serif font-bold text-2xl flex items-center justify-center flex-shrink-0 border border-gold/40">
+                      {selectedCustomer.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <h3
+                      className="text-2xl font-serif text-charcoal font-bold"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      {selectedCustomer.name}
+                    </h3>
+                    <div className="flex items-center gap-2 pt-0.5">
+                      <span className="text-[11px] bg-gold/15 text-burgundy font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        Role: {selectedCustomer.role}
+                      </span>
+                      {selectedCustomer.phoneVerified ? (
+                        <span className="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-300">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span>Phone OTP Verified 🟢</span>
+                        </span>
+                      ) : (
+                        <span className="text-[11px] bg-amber-50 text-amber-700 font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-amber-200">
+                          <Clock className="w-3 h-3 text-amber-600" />
+                          <span>Unverified Mobile ⏳</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCustomer(null)}
+                  className="p-1 rounded-full hover:bg-cream-soft text-charcoal-muted"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
+              {/* Contact & Verification Box */}
+              <div className="bg-[#FFF9F3] border border-gold/30 rounded-2xl p-4 space-y-3 text-xs">
+                <h4 className="font-serif font-bold text-sm text-burgundy uppercase tracking-wider flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-gold-dark" />
+                  <span>Contact & Verification Status</span>
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-charcoal">
+                  <div className="bg-white p-3 rounded-xl border border-blush/60 space-y-1">
+                    <span className="text-[10px] text-charcoal-muted block uppercase font-bold">Email Address</span>
+                    <a
+                      href={`mailto:${selectedCustomer.email}`}
+                      className="font-medium text-burgundy hover:underline flex items-center gap-1 truncate"
+                    >
+                      <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="truncate">{selectedCustomer.email}</span>
+                    </a>
+                  </div>
 
+                  <div className="bg-white p-3 rounded-xl border border-blush/60 space-y-1">
+                    <span className="text-[10px] text-charcoal-muted block uppercase font-bold">Mobile Phone</span>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-charcoal">
+                        {selectedCustomer.phone
+                          ? `+91 ${selectedCustomer.phone.replace(/[^0-9]/g, "").slice(-10)}`
+                          : "Not provided"}
+                      </span>
+                      {selectedCustomer.phoneVerified && (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Delivery Address Box */}
+              <div className="space-y-2 text-xs">
+                <span className="font-serif font-bold text-xs text-burgundy uppercase tracking-wider block">
+                  Delivery & Shipping Address
+                </span>
+                <div className="bg-cream-soft/60 p-3.5 rounded-2xl border border-blush text-charcoal space-y-1 leading-relaxed">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 text-gold-dark flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">
+                        {selectedCustomer.address || "Street address not provided"}
+                      </p>
+                      <p className="text-charcoal-muted text-[11px]">
+                        {selectedCustomer.city || "Tamil Nadu"}
+                        {selectedCustomer.pincode ? ` - Pincode: ${selectedCustomer.pincode}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lifetime Order Metrics */}
+              <div className="grid grid-cols-3 gap-2.5 text-center text-xs">
+                <div className="bg-white p-3 rounded-2xl border border-blush">
+                  <span className="text-[10px] text-charcoal-muted block uppercase font-semibold">Total Orders</span>
+                  <span className="font-serif font-bold text-burgundy text-lg">{selectedCustomer.totalOrders || 0}</span>
+                </div>
+                <div className="bg-white p-3 rounded-2xl border border-blush">
+                  <span className="text-[10px] text-charcoal-muted block uppercase font-semibold">Total Spent</span>
+                  <span className="font-serif font-bold text-burgundy text-lg">₹{(selectedCustomer.totalSpent || 0).toLocaleString("en-IN")}</span>
+                </div>
+                <div className="bg-white p-3 rounded-2xl border border-blush">
+                  <span className="text-[10px] text-charcoal-muted block uppercase font-semibold">Member Since</span>
+                  <span className="font-semibold text-charcoal text-xs block mt-1">{selectedCustomer.joinedDate || "Recent"}</span>
+                </div>
+              </div>
+
+              {/* Actions Footer */}
+              <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-3 border-t border-cream-warm">
+                {selectedCustomer.phone && (
+                  <a
+                    href={`https://wa.me/91${selectedCustomer.phone.replace(/[^0-9]/g, "").slice(-10)}?text=Hello%20${encodeURIComponent(selectedCustomer.name)},%20greetings%20from%20Nithu%20Fashion%20World!`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full sm:flex-1 py-2.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 shadow-sm transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4 fill-current" />
+                    <span>WhatsApp Customer</span>
+                  </a>
+                )}
+                <a
+                  href={`mailto:${selectedCustomer.email}`}
+                  className="w-full sm:flex-1 py-2.5 bg-burgundy hover:bg-burgundy-deep text-cream text-xs font-semibold rounded-full flex items-center justify-center gap-2 transition-all"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>Send Email</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCustomer(null)}
+                  className="w-full sm:w-auto px-5 py-2.5 border border-blush hover:bg-cream-soft text-charcoal-muted text-xs font-semibold rounded-full transition-all"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

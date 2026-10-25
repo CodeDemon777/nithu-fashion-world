@@ -4,6 +4,8 @@ export interface ICustomerDocument extends Document {
   name: string;
   email: string;
   phone?: string;
+  phoneVerified?: boolean;
+  phoneVerifiedAt?: Date;
   password?: string;
   role: "customer" | "admin";
   address?: string;
@@ -39,6 +41,14 @@ const CustomerSchema = new Schema<ICustomerDocument>(
       default: "",
       trim: true,
       maxlength: 20,
+    },
+    phoneVerified: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    phoneVerifiedAt: {
+      type: Date,
     },
     password: {
       type: String,
@@ -111,6 +121,10 @@ const CustomerSchema = new Schema<ICustomerDocument>(
     },
   }
 );
+
+if (process.env.NODE_ENV !== "production") {
+  delete (mongoose.models as any).Customer;
+}
 
 const CustomerModel: Model<ICustomerDocument> =
   mongoose.models.Customer ||

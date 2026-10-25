@@ -14,6 +14,8 @@ interface AuthContextType {
   authModalTab: "login" | "signup";
   setAuthModalTab: (tab: "login" | "signup") => void;
   loginAsDemoCustomer: () => void;
+  sendPhoneOtp: (phone: string, email?: string, name?: string) => Promise<{ success: boolean; previewOtp?: string; error?: string }>;
+  verifyPhoneOtp: (payload: { phone: string; code: string; name: string; email: string; password?: string }) => Promise<{ success: boolean; error?: string; customer?: User }>;
   customersList: User[];
   isLoadingCustomers: boolean;
   refreshCustomers: () => Promise<void>;
@@ -34,6 +36,7 @@ const DEMO_USERS: (User & { password: string })[] = [
     password: "user123",
     totalOrders: 3,
     totalSpent: 4296,
+    phoneVerified: true,
   },
 ];
 
@@ -216,6 +219,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const sendPhoneOtp = async (phone: string, email?: string, name?: string) => {
+    try {
+      const res = await fetch("/api/auth/otp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, email, name }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Failed to send verification code." };
+      }
+      return { success: true, previewOtp: data.previewOtp };
+    } catch (e: any) {
+      return { success: false, error: "Network error while sending OTP. Please try again." };
+    }
+  };
+
+  const verifyPhoneOtp = async (payload: {
+    phone: string;
+    code: string;
+    name: string;
+    email: string;
+    password?: string;
+  }) => {
+    try {
+      const res = await fetch("/api/auth/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success || !data.customer) {
+        return { success: false, error: data.error || "Verification failed." };
+      }
+
+      saveUserSession(data.customer);
+      setIsAuthModalOpen(false);
+      refreshCustomers();
+      return { success: true, customer: data.customer };
+    } catch (e: any) {
+      return { success: false, error: "Network error while verifying OTP. Please try again." };
+    }
+  };
+
   const loginAsDemoCustomer = () => {
     const cust = DEMO_USERS[0];
     const { password, ...safeUser } = cust;
@@ -236,6 +283,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authModalTab,
         setAuthModalTab,
         loginAsDemoCustomer,
+        sendPhoneOtp,
+        verifyPhoneOtp,
         customersList,
         isLoadingCustomers,
         refreshCustomers,
